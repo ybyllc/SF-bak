@@ -1,0 +1,37 @@
+# OS / editor
+Thumbs.db
+.DS_Store
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# Logs / locks
+*.log
+*.lock
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Keil MDK user files
+**/MDK-ARM/*.uvguix.*
+**/MDK-ARM/*.uvoptx
+**/MDK-ARM/*.bak
+**/MDK-ARM/*.codex_bak_*
+**/MDK-ARM/build_log.txt
+**/MDK-ARM/build_output.txt
+**/MDK-ARM/.vscode/
+
+# Keil MDK build artifacts
+**/MDK-ARM/**/*.o
+**/MDK-ARM/**/*.d
+**/MDK-ARM/**/*.dep
+**/MDK-ARM/**/*.axf
+**/MDK-ARM/**/*.crf
+**/MDK-ARM/**/*.iex
+**/MDK-ARM/**/*.lnp
+**/MDK-ARM/**/*.lst
+**/MDK-ARM/**/*.map
+**/MDK-ARM/**/*.htm
+**/MDK-ARM/**/*.hex
