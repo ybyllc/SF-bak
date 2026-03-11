@@ -1,0 +1,17 @@
+程序安装和下载：
+http://bbs.zskjdg.com/detail/23
+入门教程：
+https://www.bilibili.com/video/BV17y4y1r7c2/
+
+汇控PLC手册:https://huikong.oss-cn-shenzhen.aliyuncs.com/%E4%BA%A7%E5%93%81%E4%BD%BF%E7%94%A8%E6%89%8B%E5%86%8C%E6%B1%87%E6%8E%A7-/PLC/PLC%E7%B3%BB%E5%88%97%E4%BD%BF%E7%94%A8%E6%89%8B%E5%86%8C%EF%BC%88RS485%E7%89%88%EF%BC%89.pdf
+
+
+参考资料：
+plc485通讯
+http://bbs.zskjdg.com/detail/24
+PLC脉冲篇
+http://bbs.zskjdg.com/detail/31
+plc和昆仑通泰通讯：
+http://bbs.zskjdg.com/detail/27
+PLC与威纶通通讯：
+http://bbs.zskjdg.com/detail/29
