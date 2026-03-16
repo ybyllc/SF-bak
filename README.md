@@ -1,10 +1,10 @@
 # SF-bak - 四方拖拉机项目备份
 
-> 本仓库是四方集团电子项目的日常工作备份，包含项目资料、代码、文档等。
+> 本仓库是四方集团电子项目的日常工作备份，包含项目资料、代码、硬件、文档等。
 
 ---
 
-## 📋 离职前待办事项
+## 📋 待办事项
 
 > 更新时间：2026-03-11
 
@@ -28,7 +28,7 @@
 
 | 类别 | 工具 |
 |------|------|
-| **代码编译** | Keil + CubeMX |
+| **代码编程** | Keil + STM32CubeMX |
 | **硬件设计** | 立创 EDA 标准版 |
 
 ---
@@ -48,12 +48,5 @@ SF-bak/
 
 ## 🔗 相关仓库
 
-- [tea-field-os](https://github.com/ybyllc/tea-field-os) - 下一代电动拖拉机平台
 - [stm32-tea-lib](https://github.com/ybyllc/stm32-tea-lib) - STM32 常用外设驱动
-- [openclaw-bak](https://github.com/ybyllc/openclaw-bak) - OpenClaw 配置备份
 
----
-
-## 📝 更新记录
-
-- 2026-03-11: 创建 README，整理离职前待办事项
