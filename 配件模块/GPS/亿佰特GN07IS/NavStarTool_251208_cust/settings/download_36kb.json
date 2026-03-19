@@ -1,0 +1,112 @@
+{
+    "BinFile": "",
+    "Commands": [
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Attach",
+            "Goto": 12,
+            "Id": 1,
+            "MainType": 4,
+            "ReSend": 3600000,
+            "SubType": 0,
+            "Timeout": 10
+        },
+        {
+            "Format": "Percentage",
+            "FormattedOutput": "Config Mem",
+            "Goto": 12,
+            "Id": 2,
+            "MainType": 6,
+            "Parameter": [
+                "2",
+                "536904288",
+                "1",
+                "0"
+            ],
+            "ReSend": 1,
+            "SubType": 0,
+            "Timeout": 20
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Config Register",
+            "Goto": 12,
+            "Id": 2,
+            "MainType": 12,
+            "Parameter": [
+                "0",
+                "2",
+                "2000",
+                "1711276032"
+            ],
+            "ReSend": 1,
+            "SubType": 10,
+            "Timeout": 1000
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Config Register",
+            "Goto": 12,
+            "Id": 3,
+            "MainType": 12,
+            "Parameter": [
+                "0",
+                "2",
+                "200000",
+                "2566914048"
+            ],
+            "ReSend": 1,
+            "SubType": 10,
+            "Timeout": 1000
+        },
+        {
+            "Format": "Percentage",
+            "FormattedOutput": "Bin Downloading",
+            "Goto": 12,
+            "Id": 10,
+            "MainType": 12,
+            "Parameter": [
+                "0",
+                "512",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 5,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Percentage",
+            "FormattedOutput": "Bin Verifying",
+            "Goto": 11,
+            "Id": 45,
+            "MainType": 12,
+            "Parameter": [
+                "0",
+                "512",
+                "0"
+            ],
+            "ReSend": 10,
+            "SubType": 0,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Releasing",
+            "Goto": 12,
+            "Id": 12,
+            "MainType": 4,
+            "ReSend": 3,
+            "SubType": 1,
+            "Timeout": 1500
+        }
+    ],
+    "EnableFlashCheck": true,
+    "EnableNvErasing": true,
+    "EnablePortDetect": true,
+    "EnableSettingErasing": true,
+    "EnableWriteBack": true,
+    "HashFormatFile": "",
+    "MaxBaudRate": 2000000,
+    "MinBaudRate": 9600,
+    "Name": "Download"
+}

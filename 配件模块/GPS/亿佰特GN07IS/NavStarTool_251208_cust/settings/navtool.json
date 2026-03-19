@@ -1,0 +1,167 @@
+{
+    "CommandUtils": [
+        {
+            "code": 2,
+            "name": "Control",
+            "sublist": [
+                {
+                    "code": 0,
+                    "name": "Rcv Start"
+                },
+                {
+                    "code": 1,
+                    "name": "Rcv Stop"
+                },
+                {
+                    "code": 2,
+                    "name": "Set Test Mode"
+                },
+                {
+                    "code": 3,
+                    "name": "Set Baudrate"
+                },
+                {
+                    "code": 5,
+                    "name": "WTD Reset"
+                },
+                {
+                    "code": 6,
+                    "name": "Set Output Rate"
+                }
+            ]
+        },
+        {
+            "code": 0,
+            "name": "Power",
+            "sublist": [
+                {
+                    "code": 3,
+                    "name": "Deep Sleep"
+                }
+            ]
+        },
+        {
+            "code": 24,
+            "name": "SetTime",
+            "sublist": [
+                {
+                    "code": 2,
+                    "name": "Preset XO PPB"
+                }
+            ]
+        },
+        {
+            "code": 32,
+            "name": "NAV CFG",
+            "sublist": [
+                {
+                    "code": 2,
+                    "name": "Save Flash"
+                },
+                {
+                    "code": 0,
+                    "name": "Receiver Mode"
+                },
+                {
+                    "code": 7,
+                    "name": "Position Mode"
+                },
+                {
+                    "code": 1,
+                    "name": "Measurement Mode"
+                },
+                {
+                    "code": 5,
+                    "name": "Align Time Sys"
+                },
+                {
+                    "code": 6,
+                    "name": "Preset Gps Week"
+                },
+                {
+                    "code": 3,
+                    "name": "Low Level Config"
+                }
+            ]
+        },
+        {
+            "code": 34,
+            "name": "LPBG CALI",
+            "sublist": [
+                {
+                    "code": 0,
+                    "name": "LPBG calibration"
+                }
+            ]
+        },
+        {
+            "code": 12,
+            "name": "FLASH",
+            "sublist": [
+                {
+                    "code": 3,
+                    "name": "Read Flash"
+                }
+            ]
+        }
+    ],
+    "EnableBaudrateSwitch": false,
+    "EnableInfoShow": true,
+    "EnableSaveMeas": true,
+    "FlashEraselist": [
+        {
+            "code": "0xFD559874",
+            "name": "1662N"
+        },
+        {
+            "code": "0xCEC9CEC9",
+            "name": "1616P"
+        }
+    ],
+    "GroundTruth": [
+    ],
+    "HashFiles": [
+    ],
+    "JsonLibPath": "",
+    "LastOpenedPath": {
+    },
+    "MapSource": "file:////192.168.60.217/map/MAP/index.html",
+    "MaxLogFileSize": "500 MB",
+    "MeasTxt": [
+    ],
+    "Mqtt": {
+        "SSL": false,
+        "lat": 31.2345,
+        "lon": 121.5678,
+        "password": "unknown",
+        "port": 1883,
+        "server": "",
+        "time": "",
+        "topic": "",
+        "user": "unknown",
+        "valid": false
+    },
+    "PortRaw": [
+    ],
+    "RegCommandThreshold": 4,
+    "RegCommandTimeout": 400,
+    "RegSettingPath": "",
+    "RoverNmea": [
+    ],
+    "RtcmOption": {
+        "path": "",
+        "save": false
+    },
+    "Serial Port": {
+        "DownloadDefaultBaud": 115200,
+        "LastOpenedBaud": 115200,
+        "port": "COM4",
+        "shouldFullSpeed": false
+    },
+    "Tcp": {
+        "key": "",
+        "port": 0,
+        "server": ""
+    },
+    "UpToDateDataFile": ""
+}

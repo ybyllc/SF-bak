@@ -1,0 +1,46 @@
+{
+    "TtffCfg": {
+        "Agnss": false,
+        "Duration": 1,
+        "Exeph": false,
+        "Time": false,
+        "sublist": [
+            {
+                "Command Timeout": 1000,
+                "Count": 10,
+                "Duration": 20,
+                "Pre Track": 0,
+                "Test Point At": 0,
+                "Track After Fix": true,
+                "name": "Hot Start Session",
+                "valid": true
+            },
+            {
+                "Command Timeout": 1000,
+                "Count": 10,
+                "Duration": 60,
+                "Pre Track": 0,
+                "Test Point At": 0,
+                "Track After Fix": false,
+                "name": "Cold Start Session",
+                "valid": false
+            },
+            {
+                "Command Timeout": 1000,
+                "Count": 10,
+                "Duration": 99,
+                "Test Point At": 0,
+                "Track After Fix": false,
+                "name": "Factory Start Session",
+                "valid": false
+            },
+            {
+                "Command Timeout": 200,
+                "Count": 1,
+                "Duration": 30,
+                "name": "Continuous Start Session",
+                "valid": false
+            }
+        ]
+    }
+}

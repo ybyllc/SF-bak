@@ -1,0 +1,223 @@
+{
+	"comment":	"Default Configuration",
+	"configs":[
+		{
+			"chipType":"1661",
+			"sections":[
+				{
+					"configType":"车载记录仪定位器",
+					"leafs":[
+						{
+							"leaf_name":	"Power Manage Level",
+							"leaf_type":	"enum",
+							"leaf_value":	1
+						}, {
+							"leaf_name":	"NMEA Misc",
+							"leaf_type":	"bitmask",
+							"leaf_value":	"0x10000000"
+						},{
+							"leaf_name":	"Weak Signal Mode",
+							"leaf_type":	"enum",
+							"leaf_value":	1
+						},{
+							"leaf_name":	"Tunnel Fix Priority",
+							"leaf_type":	"enum",
+							"leaf_value":	1
+						}
+					]
+				},
+				{
+					"configType":"人员宠物",
+					"leafs":[
+						{
+							"leaf_name":	"Power Manage Level",
+							"leaf_type":	"enum",
+							"leaf_value":	1
+						}, {
+							"leaf_name":	"NMEA Misc",
+							"leaf_type":	"bitmask",
+							"leaf_value":	"0x0",
+							"leaf_value_clr":  "0x10000000"
+						},{
+							"leaf_name":	"Weak Signal Mode",
+							"leaf_type":	"enum",
+							"leaf_value":	0
+						},{
+							"leaf_name":	"Tunnel Fix Priority",
+							"leaf_type":	"enum",
+							"leaf_value":	0
+						}
+					]
+				},
+				{
+					"configType":"无人机",
+					"leafs":[
+						{
+							"leaf_name": "Power Manage Level",
+                            "leaf_type": "enum",
+							"leaf_value":	1
+						}, {
+							 "leaf_name": "Working Rate",
+                             "leaf_type": "enum",
+							 "leaf_value":	10
+						},{
+							"leaf_name":	"Output POLARIS Message",
+							"leaf_type":	"bitmask",
+							"leaf_value":	"0x1"
+						},{
+							"leaf_name":	"NMEA Misc",
+							"leaf_type":	"bitmask",
+							"leaf_value":	"0x0",
+							"leaf_value_clr":  "0x10000800"
+						},{
+							"leaf_name":	"Position Mode",
+							"leaf_type":	"enum",
+							"leaf_value":	1
+						},{
+							"leaf_name":	"Receiver Mode",
+							"leaf_type":	"enum",
+							"leaf_value":	8
+						},{
+							"leaf_name":	"Detect Static",
+							"leaf_type":	"enum",
+							"leaf_value":	1
+						},{
+							"leaf_name":	"Fast Fix Mode",
+							"leaf_type":	"enum",
+							"leaf_value":	0
+						},{
+							"leaf_name":	"Weak Signal Mode",
+							"leaf_type":	"enum",
+							"leaf_value":	0
+						},{
+							"leaf_name":	"Tunnel Fix Priority",
+							"leaf_type":	"enum",
+							"leaf_value":	0
+						},{
+							"leaf_name":	"Iono Delay Reduce Mode",
+							"leaf_type":	"enum",
+							"leaf_value":	3
+						},{
+							"leaf_name":	"Relative Accuracy Mode",
+							"leaf_type":	"enum",
+							"leaf_value":	1
+						}
+					]
+				}
+			]
+		},
+		{
+			"chipType":"1662",
+			"sections":[
+				{
+					
+				}
+			]
+		},
+		{
+			"chipType":"1616",
+			"sections":[
+				{
+					"configType":"车载记录仪定位器",
+					"leafs":[
+						{
+							"leaf_name":	"Power Manage Level",
+							"leaf_type":	"enum",
+							"leaf_value":	1
+						}, {
+							"leaf_name":	"NMEA Misc",
+							"leaf_type":	"bitmask",
+							"leaf_value":	"0x40000"
+						},{
+							"leaf_name":	"Weak Signal Mode",
+							"leaf_type":	"enum",
+							"leaf_value":	1
+						},{
+							"leaf_name":	"Tunnel Fix Priority",
+							"leaf_type":	"enum",
+							"leaf_value":	1
+						}
+					]
+				},
+				{
+					"configType":"人员宠物",
+					"leafs":[
+						{
+							"leaf_name":	"Power Manage Level",
+							"leaf_type":	"enum",
+							"leaf_value":	1
+						}, {
+							"leaf_name":	"NMEA Misc",
+							"leaf_type":	"bitmask",
+							"leaf_value":	"0x0",
+							"leaf_value_clr":  "0x40000"
+						},{
+							"leaf_name":	"Weak Signal Mode",
+							"leaf_type":	"enum",
+							"leaf_value":	0
+						},{
+							"leaf_name":	"Tunnel Fix Priority",
+							"leaf_type":	"enum",
+							"leaf_value":	0
+						}
+					]
+				},
+				{
+					"configType":"无人机",
+					"leafs":[
+						{
+							"leaf_name": "Power Manage Level",
+                            "leaf_type": "enum",
+							"leaf_value":	1
+						}, {
+							 "leaf_name": "Working Rate",
+                             "leaf_type": "enum",
+							 "leaf_value":	10
+						},{
+							"leaf_name":	"Output POLARIS Message",
+							"leaf_type":	"bitmask",
+							"leaf_value":	"0x1"
+						},{
+							"leaf_name":	"NMEA Misc",
+							"leaf_type":	"bitmask",
+							"leaf_value":	"0x0",
+							"leaf_value_clr":  "0x10000800"
+						},{
+							"leaf_name":	"Position Mode",
+							"leaf_type":	"enum",
+							"leaf_value":	1
+						},{
+							"leaf_name":	"Receiver Mode",
+							"leaf_type":	"enum",
+							"leaf_value":	8
+						},{
+							"leaf_name":	"Detect Static",
+							"leaf_type":	"enum",
+							"leaf_value":	1
+						},{
+							"leaf_name":	"Fast Fix Mode",
+							"leaf_type":	"enum",
+							"leaf_value":	0
+						},{
+							"leaf_name":	"Weak Signal Mode",
+							"leaf_type":	"enum",
+							"leaf_value":	0
+						},{
+							"leaf_name":	"Tunnel Fix Priority",
+							"leaf_type":	"enum",
+							"leaf_value":	0
+						},{
+							"leaf_name":	"Iono Delay Reduce Mode",
+							"leaf_type":	"enum",
+							"leaf_value":	3
+						},{
+							"leaf_name":	"Relative Accuracy Mode",
+							"leaf_type":	"enum",
+							"leaf_value":	1
+						}
+					]
+				}
+			]
+		}
+	]
+}

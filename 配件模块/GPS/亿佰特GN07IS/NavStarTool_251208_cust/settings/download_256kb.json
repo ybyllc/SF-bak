@@ -1,0 +1,183 @@
+{
+    "BinFile": "",
+    "Commands": [
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Attach",
+            "Goto": 12,
+            "Id": 1,
+            "MainType": 4,
+            "ReSend": 3600000,
+            "SubType": 0,
+            "Timeout": 10
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Config Register",
+            "Goto": 12,
+            "Id": 2,
+            "MainType": 12,
+            "Parameter": [
+                "0",
+                "1",
+                "2000",
+                "1342177280"
+            ],
+            "ReSend": 1,
+            "SubType": 10,
+            "Timeout": 1000
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Config Register",
+            "Goto": 12,
+            "Id": 3,
+            "MainType": 12,
+            "Parameter": [
+                "0",
+                "2",
+                "200000",
+                "16777216"
+            ],
+            "ReSend": 1,
+            "SubType": 10,
+            "Timeout": 1000
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Uart set",
+            "Goto": 12,
+            "Id": 4,
+            "MainType": 2,
+            "Parameter": [
+                "768",
+                "2000000",
+                "5000",
+                "10000",
+                "2000000"
+            ],
+            "ReSend": 0,
+            "SubType": 3,
+            "Timeout": 750
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "UART ACK",
+            "Goto": 12,
+            "Id": 5,
+            "MainType": 2,
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 50
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 12,
+            "Id": 6,
+            "MainType": 12,
+            "Parameter": [
+                "0",
+                "82",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 12,
+            "Id": 7,
+            "MainType": 12,
+            "Parameter": [
+                "32768",
+                "32",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 12,
+            "Id": 8,
+            "MainType": 12,
+            "Parameter": [
+                "36864",
+                "32",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 12,
+            "Id": 9,
+            "MainType": 12,
+            "Parameter": [
+                "40960",
+                "32",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Percentage",
+            "FormattedOutput": "Bin Downloading",
+            "Goto": 12,
+            "Id": 10,
+            "MainType": 12,
+            "Parameter": [
+                "0",
+                "512",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 5,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Percentage",
+            "FormattedOutput": "Bin Verifying",
+            "Goto": 11,
+            "Id": 45,
+            "MainType": 12,
+            "Parameter": [
+                "0",
+                "512",
+                "0"
+            ],
+            "ReSend": 10,
+            "SubType": 0,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Releasing",
+            "Goto": 12,
+            "Id": 12,
+            "MainType": 4,
+            "ReSend": 3,
+            "SubType": 1,
+            "Timeout": 1500
+        }
+    ],
+    "EnableFlashCheck": true,
+    "EnableNvErasing": true,
+    "EnablePortDetect": true,
+    "EnableSettingErasing": true,
+    "EnableWriteBack": true,
+    "HashFormatFile": "",
+    "MaxBaudRate": 2000000,
+    "MinBaudRate": 9600,
+    "Name": "Download"
+}

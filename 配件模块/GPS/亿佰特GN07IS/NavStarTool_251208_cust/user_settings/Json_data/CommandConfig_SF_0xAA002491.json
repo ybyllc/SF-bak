@@ -1,0 +1,890 @@
+{
+  "comment": "Version number cannot be changed",
+  "configs": [
+    {
+      "version": "0xAA002491",
+      "total_length": 440,
+      "crc_type": 32,
+      "sections": [
+        {
+          "section_name": "System Parameters",
+          "section_data_length": 200,
+          "leafs": [
+            {
+              "leaf_name": "Baudrate",
+              "leaf_type": "enum",
+              "leaf_value_list": "4800,9600,38400,57600,115200,230400,460800,921600,1000000,2000000",
+              "leaf_value_text": "4800,9600,38400,57600,115200,230400,460800,921600,1000000,2000000",
+              "leaf_value": 115200,
+              "leaf_data_length": 4,
+              "leaf_comment": "Serial IO baudrate",
+              "bm_upd_valid_bit": 4
+            },
+            {
+              "leaf_name": "SaveToFlash",
+              "leaf_type": "enum",
+              "leaf_value_list": "0,1",
+              "leaf_value_text": "No,Yes",
+              "leaf_value": 1,
+              "leaf_data_length": 1,
+              "leaf_comment": "Save all config items of current page to Flash"
+            },
+            {
+              "leaf_name": "Secondary UartID",
+              "leaf_type": "enum",
+              "leaf_value_list": "0,1,2",
+              "leaf_value_text": "UART0,UART1,UART2",
+              "leaf_value": 1,
+              "leaf_data_length": 1,
+              "leaf_comment": "Secondary Serial IO select",
+              "bm_upd_valid_bit": 23
+            },
+            {
+              "leaf_name": "Secondary Uart Baudrate",
+              "leaf_type": "enum",
+              "leaf_value_list": "9600,115200,460800,1000000,2000000",
+              "leaf_value_text": "9600,115200,460800,1000000,2000000",
+              "leaf_value": 115200,
+              "leaf_data_length": 4,
+              "leaf_comment": "Secondary Serial IO baudrate",
+              "bm_upd_valid_bit": 24
+			}, 
+			{
+			"section_name": "PPS Config",
+			"section_data_length": 21,
+			"leafs": 
+			[
+            {
+              "leaf_name": "PPS IO Type",
+              "leaf_type": "enum",
+              "leaf_value_list": "0,1",
+              "leaf_value_text": "GPIO0,GPIO5",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "PPS output IO type, GPIO0 by default",
+              "bm_upd_valid_bit": 26
+            },
+            {
+              "leaf_name": "PPS Pulse Mode",
+              "leaf_type": "enum",
+              "leaf_value_list": "0,1",
+              "leaf_value_text": "Rising Edge,Falling Edge",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "PPS pulse edge type, Rising Edge by default"
+            },
+            {
+              "leaf_name": "PPS Output Type",
+              "leaf_type": "enum",
+							"leaf_value_list":	"0,1,2",
+							"leaf_value_text":	"Accurate Time,Always,Disabled",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "PPS output type, Ouput When Time Accurate by default"
+            },
+            {
+              "leaf_name": "PPS Pulse Interval (ms)",
+              "leaf_type": "number",
+              "leaf_value_max": "100000",
+              "leaf_value": 1000,
+              "leaf_data_length": 4,
+              "leaf_comment": "PPS pulse interval(unit:ms), 1000ms by default"
+            },
+            {
+              "leaf_name": "PPS Pulse Width (us)",
+              "leaf_type": "number",
+              "leaf_value_max": "100000000",
+              "leaf_value": 200000,
+              "leaf_data_length": 4,
+              "leaf_comment": "PPS pulse width(unit:us), 200ms by default"
+            },
+            {
+              "leaf_name": "PPS Cable Delay (ns)",
+              "leaf_type": "number",
+              "leaf_value_max": "32767",
+              "leaf_value": 0,
+              "leaf_data_length": 2,
+              "leaf_comment": "PPS cable delay(unit:ns), 0ns by default"
+            },
+            {
+              "leaf_name": "PPS Reserved",
+              "leaf_type": "enum",
+              "leaf_value_list": "0",
+              "leaf_value_text": "Invalid",
+              "leaf_value": 0,
+              "leaf_data_length": 8,
+              "leaf_comment": "PPS Reserved"
+			}
+			]
+			}, {
+              "leaf_name": "GPIO CFG",
+              "leaf_type": "bitmask",
+              "leaf_value_list": "0,4,14,18,19",
+              "leaf_value_text": "GPIO_0,GPIO_4,GPIO_14,GPIO_18,GPIO_19",
+              "leaf_value": "0x0",
+              "leaf_data_length": 4,
+              "leaf_comment": "GNSS GPIO CFG bitmask",
+	            "bm_upd_valid_bit": 30
+            },
+	          {
+              "leaf_name": "DBG MODE",
+              "leaf_type": "enum",
+              "leaf_value_list": "0,1,3",
+              "leaf_value_text": "2M_DBG,NMEA_ONLY,CUS_DBG",
+              "leaf_value": 1,
+              "leaf_data_length": 1,
+              "leaf_comment": "CUS DBG CFG ",
+              "bm_upd_valid_bit": 34
+            },
+     	      {
+              "leaf_name": "Enable Master or Slave",
+              "leaf_type": "enum",
+              "leaf_value_list": "0,1,2",
+              "leaf_value_text": "DISABLE,MASTER,SLAVE",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "Master or slave cfg for dual ant, disable by default",
+              "bm_upd_valid_bit": 38
+            },
+            {
+              "leaf_name": "Power Manage Level",
+              "leaf_type": "enum",
+              "leaf_value_list": "0,1",
+              "leaf_value_text": "Balanced,Full Power",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "Power Manage Level CFG ",
+              "bm_upd_valid_bit": 42
+            },
+            {
+              "leaf_name": "Customization Number",
+              "leaf_type": "number",
+              "leaf_value_max": "254",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "ID Number In Customization",
+              "bm_upd_valid_bit": 48
+            },
+     	    {
+              "leaf_name": "Flash Aiding",
+              "leaf_type": "enum",
+              "leaf_value_list": "0,1",
+              "leaf_value_text": "ENABLE,Disable",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "use imformation in flash to achieve fast fix",
+              "bm_upd_valid_bit": 67
+            },
+			{
+              "leaf_name": "EXT_LNA_LDO Ctrl",
+              "leaf_type": "enum",
+              "leaf_value_list": "0,1",
+              "leaf_value_text": "ON,OFF",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "Ext_lna_ldo On/Off Ctrl",
+              "bm_upd_valid_bit": 70
+            },
+			{
+				"leaf_name":	"IO Type",
+				"leaf_type":	"enum",
+				"leaf_value_list":	"0,1,2",
+				"leaf_value_text":	"UART0,I2C,UART1",
+				"leaf_value":	0,
+				"leaf_data_length":	1,
+				"leaf_comment":	"Serial IO type, UART by default",
+				"bm_upd_valid_bit":	95
+			},
+			{
+				"leaf_name":	"I2C IO POS",
+				"leaf_type":	"enum",
+				"leaf_value_list":	"0,1",
+				"leaf_value_text":	"IO8,IO7",
+				"leaf_value":	0,
+				"leaf_data_length":	1,
+				"leaf_comment":	"I2C IO Pos select, select IO8 by default",
+				"bm_upd_valid_bit":	96
+			},
+			{
+				"leaf_name":	"EBUCK ENA",
+				"leaf_type":	"enum",
+				"leaf_value_list":	"0,1",
+				"leaf_value_text":	"OFF,ON",
+				"leaf_value":	0,
+				"leaf_data_length":	1,
+				"leaf_comment":	"External Buck ON/OFF switch, OFF by default",
+				"bm_upd_valid_bit":	98
+			},
+			{
+              "leaf_name": "EXT_LNA_LDO Voltage",
+              "leaf_type": "enum",
+              "leaf_value_list": "0,1,2,3,4,5,6,7",
+              "leaf_value_text": "2.8V,2.9V,3.0V,3.1V,1.7V,1.8V,1.9V,2.7V",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "Ext_lna_ldo output voltage",
+              "bm_upd_valid_bit": 99
+            }
+          ]
+        },
+        {
+          "section_name": "Receiver Parameters",
+          "section_data_length": 200,
+          "leafs": [
+            {
+              "leaf_name": "Working Rate",
+              "leaf_type": "enum",
+              "leaf_value_list": "1,2,5,10,20",
+              "leaf_value_text": "1,2,5,10,20",
+              "leaf_value": 1,
+              "leaf_data_length": 1,
+              "leaf_comment": "GNSS receiver working rate in Hz",
+              "bm_upd_valid_bit": 3
+            },
+            {
+              "leaf_name": "Constellation Signal",
+              "leaf_type": "bitmask",
+              "leaf_value_list": "0,1,2,3,4,5,6,7,8,9,12,13,14,15,16",
+              "leaf_value_text": "GPSL1,GPSL5,BDSB1I,BDSB2A,BDSB2B,BDSB1C,GLOG1,GALE1,GALE5A,GALE5B,SBASL1,IRSL5,BD2B2I,GPSL2C,GLOG2",
+              "leaf_value": "0x10E5",
+              "leaf_data_length": 4,
+              "leaf_comment": "GNSS constellation signal bitmask",
+              "bm_upd_valid_bit": 5
+            },
+            {
+              "leaf_name": "Measurement Mode",
+              "leaf_type": "enum",
+              "leaf_value_list": "0,1,2,3,4",
+              "leaf_value_text": "Default,FastMode(Uart0),SlowMode(Uart0),FastMode(Uart1),SlowMode(Uart1)",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "Measurement output mode (Uart0 or Uart1)",
+              "bm_upd_valid_bit": 6
+            },
+            {
+              "leaf_name": "Measurement Output Rate",
+              "leaf_type": "enum",
+              "leaf_value_list": "1,2,5,10,20",
+              "leaf_value_text": "1,2,5,10,20",
+              "leaf_value": 1,
+              "leaf_data_length": 1,
+              "leaf_comment": "Measurement output rate in Hz",
+              "bm_upd_valid_bit": 7
+            },
+            {
+              "leaf_name": "Measurement Time System",
+              "leaf_type": "enum",
+              "leaf_value_list": "0,1,2,3",
+              "leaf_value_text": "GPST,BDST,GLOT,GALT",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "Measurement aligned time system, GPS Time by default",
+              "bm_upd_valid_bit": 8
+            },
+            {
+              "leaf_name": "Receiver Time System",
+              "leaf_type": "enum",
+              "leaf_value_list": "0,1,2,3",
+              "leaf_value_text": "GPST,BDST,GLOT,GALT",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "Receiver aligned time system, GPS Time by default",
+              "bm_upd_valid_bit": 9
+            },
+            {
+              "leaf_name": "PPS Time System",
+              "leaf_type": "enum",
+              "leaf_value_list": "0,1,2,3",
+              "leaf_value_text": "GPST,BDST,GLOT,GALT",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "PPS aligned time system, GPS Time by default",
+              "bm_upd_valid_bit": 10
+            },
+            {
+              "leaf_name": "Min GPS Week",
+              "leaf_type": "number",
+              "leaf_value_max": "0xFFFF",
+              "leaf_value": 1564,
+              "leaf_data_length": 2,
+              "leaf_comment": "Preset minimum GPS week number of NAV message",
+              "bm_upd_valid_bit": 11
+            },
+            {
+              "leaf_name": "Output NMEA Message",
+              "leaf_type": "bitmask",
+              "leaf_value_list": "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,20,21",
+              "leaf_value_text": "GGA,GSA,GSV,VTG,CNR,RMC,CLK,POL,THS,ANT,JAM,INS,GST,GLL,AID,MSM,GMP,ODO,GPA,ZDA,CUS",
+              "leaf_value": "0x302F",
+              "leaf_data_length": 4,
+              "leaf_comment": "Output NMEA message bitmask",
+              "bm_upd_valid_bit": 14
+            },
+            {
+              "leaf_name": "Output POLARIS Message",
+              "leaf_type": "bitmask",
+              "leaf_value_list": "0,1,2,3,4,5,6,7",
+              "leaf_value_text": "PVT,SVINFO,COV,SOL,POSLLH,STATUS,VELNED,DOP",
+              "leaf_value": "0",
+              "leaf_data_length": 4,
+              "leaf_comment": "Output POLARIS message bitmask",
+              "bm_upd_valid_bit": 15
+            },
+            {
+              "leaf_name": "Output RTCM MSM Version",
+              "leaf_type": "enum",
+              "leaf_value_list": "0,1",
+              "leaf_value_text": "MSM7,MSM4",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "RTCM measurement output",
+              "bm_upd_valid_bit": 16
+            },
+            {
+              "leaf_name": "Output RTCM EPH Time Interval",
+              "leaf_type": "number",
+              "leaf_value_max": "36000",
+              "leaf_value": 300,
+              "leaf_data_length": 4,
+              "leaf_comment": "RTCM EPH output repeat interval, should NOT exceed 36000 sec",
+              "bm_upd_valid_bit": 22
+            },
+            {
+              "leaf_name": "NMEA Talker ID",
+              "leaf_type": "enum",
+              "leaf_value_list": "0,1,2,3",
+              "leaf_value_text": "Auto,Force-GN,Force-GP,Force-BD",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "Auto: GP/BD/GL/GA for single system, GN for combined system, Force-GN/P: Always GN/P except GSV sentence",
+              "bm_upd_valid_bit": 28
+	         },
+	        {
+		      "leaf_name":	"Version Print",
+              "leaf_type": "enum",
+              "leaf_value_list": "0,1",
+              "leaf_value_text": "ENABLE,DISABLE",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "Disable Version Print, default 0 NOT Disable",
+              "bm_upd_valid_bit": 31
+            },
+	        {
+			  "leaf_name":	"Request AGNSS",
+              "leaf_type": "enum",
+              "leaf_value_list": "0,1",
+              "leaf_value_text": "ENABLE,DISABLE",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "Disable Request AGNSS, default 0 NOT Disable",
+              "bm_upd_valid_bit": 37
+            },
+			{
+              "leaf_name": "Enable Long Ephemeris",
+              "leaf_type": "enum",
+              "leaf_value_list": "0,1,2,3",
+              "leaf_value_text": "DISABLE,ENABLE,DISABLE+EE,ENABLE+EE",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "Default Disable",
+              "bm_upd_valid_bit": 46
+            },
+            {
+              "leaf_name": "Output RTCM Message",
+              "leaf_type": "bitmask",
+              "leaf_value_list": "0,1,2,3,4",
+              "leaf_value_text": "MEAS,EPH,ION,SBS,GEO",
+              "leaf_value": "0",
+              "leaf_data_length": 4,
+              "leaf_comment": "Output RTCM message bitmask",
+              "bm_upd_valid_bit": 49
+            },
+            {
+              "leaf_name": "ASCII Command",
+              "leaf_type": "enum",
+              "leaf_value_list": "0,1,2",
+              "leaf_value_text": "OFF,NOCS,ADDCS",
+              "leaf_value": 1,
+              "leaf_data_length": 1,
+              "leaf_comment": "ASCII Command, OFF:not support, NOCS/ADDCS:support and not add/add checksum",
+              "bm_upd_valid_bit": 56
+            },
+	        {
+              "leaf_name": "NMEA LL FRAC DIGT",
+              "leaf_type": "enum",
+              "leaf_value_list": "4,5,6,7",
+              "leaf_value_text": "DIGT4,DIGT5,DIGT6,DIGT7",
+              "leaf_value": 7,
+              "leaf_data_length": 1,
+              "leaf_comment": "NMEA lat/lon output frac digital, default 7",
+              "bm_upd_valid_bit": 58
+            },
+	        {
+              "leaf_name": "NMEA OUTPUT MASK",
+              "leaf_type": "enum",
+              "leaf_value_list": "0,1,2,3,4,5",
+              "leaf_value_text": "uart0,uart0,uart1,uart10,uart2,uart20",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "NMEA output uartid select mask, default 0",
+              "bm_upd_valid_bit": 61
+            },
+	        {
+              "leaf_name": "Interpolation Multiplier",
+              "leaf_type": "enum",
+              "leaf_value_list": "0,1",
+              "leaf_value_text": "0,1",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "NMEA output interpolation multiplier, default 0",
+              "bm_upd_valid_bit": 65
+            },
+	        {
+              "leaf_name": "NMEA Height FRAC DIGT",
+              "leaf_type": "enum",
+	          "leaf_value_list":	"1,2,3,4",
+	          "leaf_value_text":	"DIGT1,DIGT2,DIGT3,DIGT4",
+              "leaf_value": 3,
+              "leaf_data_length": 1,
+              "leaf_comment": "NMEA height output frac digital, default 3",
+              "bm_upd_valid_bit": 71
+            },
+	        {
+              "leaf_name": "NMEA UTC FRAC DIGT",
+              "leaf_type": "enum",
+              "leaf_value_list": "2,3",
+              "leaf_value_text": "DIGT2,DIGT3",
+              "leaf_value": 2,
+              "leaf_data_length": 1,
+              "leaf_comment": "NMEA utc time second output frac digital, default 2",
+              "bm_upd_valid_bit": 72
+            },
+	        {
+              "leaf_name": "NMEA DOP FRAC DIGT",
+              "leaf_type": "enum",
+              "leaf_value_list": "1,2",
+              "leaf_value_text": "DIGT1,DIGT2",
+              "leaf_value": 1,
+              "leaf_data_length": 1,
+              "leaf_comment": "NMEA dop output frac digital, default 1",
+              "bm_upd_valid_bit": 73
+            },
+	        {
+              "leaf_name": "NMEA VEL FRAC DIGT",
+              "leaf_type": "enum",
+	          "leaf_value_list": "1,2,3",
+	          "leaf_value_text": "DIGT1,DIGT2,DIGT3",
+              "leaf_value": 2,
+              "leaf_data_length": 1,
+              "leaf_comment": "NMEA velocity output frac digital, default 2",
+              "bm_upd_valid_bit": 74
+            },
+	        {
+              "leaf_name": "NMEA Misc",
+              "leaf_type": "bitmask",
+              "leaf_value_list": "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20",
+              "leaf_value_text": "BM0,BM1,BM2,BM3,BMA2,BMA4,BMA6,BDSGI,NOLOAD_FLASH,MGPS,MBDS,MGLO,MGAL,MQZS,MSBS,CRAIM,DELAY_HOLD,FAST_TTFF,FAST_FIX,TP5,GSVONE",
+              "leaf_value": "0",
+              "leaf_data_length": 4,
+              "leaf_comment": "Miscellaneous settings of NMEA outputk, default 0",
+              "bm_upd_valid_bit": 75
+            },
+            {
+              "leaf_name": "Max User Number",
+              "leaf_type": "number",
+              "leaf_value_max": "48",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "bb max user number",
+              "bm_upd_valid_bit": 76
+            },{
+                            "section_name": "Nmea Output Order",
+			                "section_data_length": 14,
+			                "leafs": [
+					                 {
+					                    "leaf_name":	"GGA Order(1-128)",
+							            "leaf_type":	"number",
+							            "leaf_value_max":	"128",
+							            "leaf_value":	0,
+							            "leaf_data_length":	1,
+							            "leaf_comment":	"GGA output order, default 0",
+							            "bm_upd_valid_bit":	77
+					                 },{
+					                    "leaf_name":	"GSA Order(1-128)",
+							            "leaf_type":	"number",
+							            "leaf_value_max":	"128",
+							            "leaf_value":	0,
+							            "leaf_data_length":	1,
+							            "leaf_comment":	"GSA output order, default 0",
+							            "bm_upd_valid_bit":	78
+                                     },{
+					                    "leaf_name":	"GSV Order(1-128)",
+							            "leaf_type":	"number",
+							            "leaf_value_max":	"128",
+							            "leaf_value":   0,
+							            "leaf_data_length":	1,
+							            "leaf_comment":	"GSV output order, default 0",
+							            "bm_upd_valid_bit":	79
+					                 },{
+					                    "leaf_name":	"VTG Order(1-128)",
+							            "leaf_type":	"number",
+							            "leaf_value_max":	"128",
+							            "leaf_value":	0,
+							            "leaf_data_length":	1,
+							            "leaf_comment":	"VTG output order, default 0",
+							            "bm_upd_valid_bit":	80
+					                 },{
+					                    "leaf_name":	"RMC Order(1-128)",
+							            "leaf_type":	"number",
+							            "leaf_value_max":	"128",
+							            "leaf_value":	0,
+							            "leaf_data_length":	1,
+							            "leaf_comment":	"RMC output order, default 0",
+							            "bm_upd_valid_bit":	81
+					                 },{
+					                    "leaf_name":	"GST Order(1-128)",
+							            "leaf_type":	"number",
+							            "leaf_value_max":	"128",
+							            "leaf_value":	0,
+							            "leaf_data_length":	1,
+							            "leaf_comment":	"GST output order, default 0",
+							            "bm_upd_valid_bit":	82
+					                 },{
+					                    "leaf_name":	"GLL Order(1-128)",
+							            "leaf_type":	"number",
+							            "leaf_value_max":	"128",
+							            "leaf_value":	0,
+							            "leaf_data_length":	1,
+							            "leaf_comment":	"GLL output order, default 0",
+							            "bm_upd_valid_bit":	83
+					                 },{
+					                    "leaf_name":	"GMP Order(1-128)",
+							            "leaf_type":	"number",
+							            "leaf_value_max":	"128",
+							            "leaf_value":	0,
+							            "leaf_data_length":	1,
+							            "leaf_comment":	"GMP output order, default 0",
+							            "bm_upd_valid_bit":	84
+					                 },{
+					                    "leaf_name":	"ZDA Order(1-128)",
+							            "leaf_type":	"number",
+							            "leaf_value_max":	"128",
+							            "leaf_value":	0,
+							            "leaf_data_length":	1,
+							            "leaf_comment":	"ZDA output order, default 0",
+							            "bm_upd_valid_bit":	85
+					                 },
+									 {
+					                    "leaf_name":	"Order Reserved(1-128)",
+							            "leaf_type":	"enum",
+							            "leaf_value_list":	"0",
+							            "leaf_value_text":	"Invalid",
+										"leaf_value":	0,
+							            "leaf_data_length":	5,
+							            "leaf_comment":	"Order Reserved, default 0"
+					                 }
+						        ]
+						    }, {
+							"section_name":	"Nmea Output Rate",
+							"section_data_length":	14,
+							"leafs":	[{
+									"leaf_name":	"GGA Rate",
+									"leaf_type":	"enum",
+									"leaf_value_list":	"0,1,2,5,10,20,50,100,200",
+									"leaf_value_text":	"0,0.1Hz,0.2Hz,0.5Hz,1Hz,2Hz,5Hz,10Hz,20Hz",
+									"leaf_value":	0,
+									"leaf_data_length":	1,
+									"leaf_comment":	"GGA output rate, default 0",
+									"bm_upd_valid_bit":	86
+								}, {
+									"leaf_name":	"GSA Rate",
+									"leaf_type":	"enum",
+									"leaf_value_list":	"0,1,2,5,10,20,50,100,200",
+									"leaf_value_text":	"0,0.1Hz,0.2Hz,0.5Hz,1Hz,2Hz,5Hz,10Hz,20Hz",
+									"leaf_value":	0,
+									"leaf_data_length":	1,
+									"leaf_comment":	"GSA output rate, default 0",
+									"bm_upd_valid_bit":	87
+								}, {
+									"leaf_name":	"GSV Rate",
+									"leaf_type":	"enum",
+									"leaf_value_list":	"0,1,2,5,10,20,50,100,200",
+									"leaf_value_text":	"0,0.1Hz,0.2Hz,0.5Hz,1Hz,2Hz,5Hz,10Hz,20Hz",
+									"leaf_value":	0,
+									"leaf_data_length":	1,
+									"leaf_comment":	"GSV output rate, default 0",
+									"bm_upd_valid_bit":	88
+								}, {
+									"leaf_name":	"VTG Rate",
+									"leaf_type":	"enum",
+									"leaf_value_list":	"0,1,2,5,10,20,50,100,200",
+									"leaf_value_text":	"0,0.1Hz,0.2Hz,0.5Hz,1Hz,2Hz,5Hz,10Hz,20Hz",
+									"leaf_value":	0,
+									"leaf_data_length":	1,
+									"leaf_comment":	"VTG output rate, default 0",
+									"bm_upd_valid_bit":	89
+								}, {
+									"leaf_name":	"RMC Rate",
+									"leaf_type":	"enum",
+									"leaf_value_list":	"0,1,2,5,10,20,50,100,200",
+									"leaf_value_text":	"0,0.1Hz,0.2Hz,0.5Hz,1Hz,2Hz,5Hz,10Hz,20Hz",
+									"leaf_value":	0,
+									"leaf_data_length":	1,
+									"leaf_comment":	"RMC output rate, default 0",
+									"bm_upd_valid_bit":	90
+								}, {
+									"leaf_name":	"GST Rate",
+									"leaf_type":	"enum",
+									"leaf_value_list":	"0,1,2,5,10,20,50,100,200",
+									"leaf_value_text":	"0,0.1Hz,0.2Hz,0.5Hz,1Hz,2Hz,5Hz,10Hz,20Hz",
+									"leaf_value":	0,
+									"leaf_data_length":	1,
+									"leaf_comment":	"GST output rate, default 0",
+									"bm_upd_valid_bit":	91
+								}, {
+									"leaf_name":	"GLL Rate",
+									"leaf_type":	"enum",
+									"leaf_value_list":	"0,1,2,5,10,20,50,100,200",
+									"leaf_value_text":	"0,0.1Hz,0.2Hz,0.5Hz,1Hz,2Hz,5Hz,10Hz,20Hz",
+									"leaf_value":	0,
+									"leaf_data_length":	1,
+									"leaf_comment":	"GLL output rate, default 0",
+									"bm_upd_valid_bit":	92
+								}, {
+									"leaf_name":	"GMP Rate",
+									"leaf_type":	"enum",
+									"leaf_value_list":	"0,1,2,5,10,20,50,100,200",
+									"leaf_value_text":	"0,0.1Hz,0.2Hz,0.5Hz,1Hz,2Hz,5Hz,10Hz,20Hz",
+									"leaf_value":	0,
+									"leaf_data_length":	1,
+									"leaf_comment":	"GMP output rate, default 0",
+									"bm_upd_valid_bit":	93
+								}, {
+									"leaf_name":	"ZDA Rate",
+									"leaf_type":	"enum",
+									"leaf_value_list":	"0,1,2,5,10,20,50,100,200",
+									"leaf_value_text":	"0,0.1Hz,0.2Hz,0.5Hz,1Hz,2Hz,5Hz,10Hz,20Hz",
+									"leaf_value":	0,
+									"leaf_data_length":	1,
+									"leaf_comment":	"ZDA output rate, default 0",
+									"bm_upd_valid_bit":	94
+								}, {
+									"leaf_name":	"Rate Reserved",
+									"leaf_type":	"enum",
+									"leaf_value_list":	"0",
+									"leaf_value_text":	"Invalid",
+									"leaf_value":	0,
+									"leaf_data_length":	5,
+									"leaf_comment":	"Rate Reserved, default 0"
+								}]
+						}
+          ]
+        },
+        {
+          "section_name": "Navigation Parameters",
+          "section_data_length": 32,
+          "leafs": [
+            {
+              "leaf_name": "Position Mode",
+              "leaf_type": "enum",
+              "leaf_value_list": "1,2,3,4,7",
+              "leaf_value_text": "SPS,SBS,RTD,RTK,DUALANT",
+              "leaf_value": 2,
+              "leaf_data_length": 1,
+              "leaf_comment": "Maximum positioning mode in use",
+              "bm_upd_valid_bit": 12
+            },
+            {
+              "leaf_name": "Receiver Mode",
+              "leaf_type": "enum",
+              "leaf_value_list": "0,1,4,8,9,10,11",
+              "leaf_value_text": "AUTO,STATIC,DRIVE,FLIGHT,BADGE,WEARABLE,BIKE",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "Preset receiver dynamic mode, AUTO by default",
+              "bm_upd_valid_bit": 13
+            },
+            {
+              "leaf_name": "Detect Static",
+              "leaf_type": "enum",
+              "leaf_value_list": "0,1,10,2,3,4,5,6,7,8,9",
+              "leaf_value_text": "ENABLE,DISABLE,<0m/s,<0.1m/s,<0.2m/s,<0.4m/s,<0.6m/s,<0.8m/s,<1.0m/s,<1.5m/s,<2.0m/s",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "Detect static mode, enable by default",
+              "bm_upd_valid_bit": 17
+            },
+            {
+              "leaf_name": "Min Cnr (Global)",
+              "leaf_type": "number",
+              "leaf_value_max": "40",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "Set minimum CNR for all GNSS signals, should NOT exceed 40 dB",
+              "bm_upd_valid_bit": 18
+            },
+            {
+              "leaf_name": "Min Elevation (Global)",
+              "leaf_type": "number",
+              "leaf_value_max": "60",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "Set minimum elevation for all GNSS satellites, should NOT exceed 60 degree",
+              "bm_upd_valid_bit": 19
+            },
+            {
+              "leaf_name": "Fast Fix Mode",
+              "leaf_type": "enum",
+              "leaf_value_list": "0,1,2",
+              "leaf_value_text": "DISABLE,AIDING,FULL-TIME",
+              "leaf_value": 2,
+              "leaf_data_length": 1,
+              "leaf_comment": "Might affect first fix accuracy. AIDING: enabled when time aiding, FULL-TIME: enabled all the time",
+              "bm_upd_valid_bit": 25
+            },
+            {
+              "leaf_name": "TTFF Delay (Sec)",
+              "leaf_type": "number",
+              "leaf_value_max": "10",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "Set TTFF Delay, should NOT exceed 10s",
+              "bm_upd_valid_bit": 27
+            },
+	          {
+              "leaf_name": "Pos Accu Opt",
+              "leaf_type": "enum",
+              "leaf_value_list": "0,1",
+              "leaf_value_text": "DISABLE,ENABLE",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "Enable Pos Accu Opt or Not",
+              "bm_upd_valid_bit": 32
+            },
+	          {
+              "leaf_name": "Pos Accu Threshold (0.1m)",
+              "leaf_type": "number",
+              "leaf_value_max": "100",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "Enable Pos Accu Opt or Not",
+              "bm_upd_valid_bit": 33
+            },
+	          {
+              "leaf_name": "Cnr Good Th ",
+              "leaf_type": "number",
+              "leaf_value_max": "50",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "Set CNR Good Threshold",
+              "bm_upd_valid_bit": 35
+            },
+	          {
+              "leaf_name": "Sats Num Th",
+              "leaf_type": "number",
+              "leaf_value_max": "100",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "Sats Num (CNR>Cnr Good Th) Threshold",
+              "bm_upd_valid_bit": 36
+            },
+            {
+              "leaf_name": "Weak Signal Mode",
+              "leaf_type": "enum",
+              "leaf_value_list": "0,1,2",
+              "leaf_value_text": "AUTO,FIX_PRIORITY,ACCURACY_PRIORITY",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "Weak signal mode",
+              "bm_upd_valid_bit": 39
+            },
+            {
+              "leaf_name": "Dual Ant Baseline Length (mm)",
+              "leaf_type": "number",
+              "leaf_value_max": "1000",
+              "leaf_value": 0,
+              "leaf_data_length": 2,
+              "leaf_comment": "Dual antenna, baseline length should be in centimeter-level accuracy; 0: invalid",
+              "bm_upd_valid_bit": 40
+            },
+	        {
+              "leaf_name": "Min NSV (Global)",
+              "leaf_type": "number",
+              "leaf_value_max": "16",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "Set minimum sats num for all GNSS signals, 0: invalid",
+              "bm_upd_valid_bit": 43
+            },
+	        {
+              "leaf_name": "Horizental Protection Level(m)",
+              "leaf_type": "number",
+              "leaf_value_max": "255",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "Set Position Horizental Protection Level Max, 0: invalid",
+              "bm_upd_valid_bit": 44
+            },
+	        {
+              "leaf_name": "Vertical Protection Level(m)",
+              "leaf_type": "number",
+              "leaf_value_max": "255",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "Ser Position Vertical Accu Protection Level, 0: invalid",
+              "bm_upd_valid_bit": 45
+            },
+	        {
+              "leaf_name": "Tunnel Fix Priority",
+              "leaf_type": "enum",
+              "leaf_value_list": "0,1",
+              "leaf_value_text": "DISABLE,ENABLE",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "Tunnel Fix Priority, Disable 0",
+              "bm_upd_valid_bit": 47
+            },
+            {
+              "leaf_name": "RTK Fix Mode",
+              "leaf_type": "enum",
+              "leaf_value_list": "4,6",
+              "leaf_value_text": "High Precision,High Availability",
+              "leaf_value": 6,
+              "leaf_data_length": 1,
+              "leaf_comment": "RTK ambiguity fix method, suggest High Precision mode for vehicle and High Availability mode for walking",
+              "bm_upd_valid_bit": 64
+            },
+	        {
+              "leaf_name": "Limit Meas Th",
+              "leaf_type": "number",
+              "leaf_value_max": "64",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "Sats Num Threshold",
+              "bm_upd_valid_bit": 68
+            },
+            {
+              "leaf_name": "Limit SVinfo Th",
+              "leaf_type": "number",
+              "leaf_value_max": "254",
+              "leaf_value": 0,
+              "leaf_data_length": 1,
+              "leaf_comment": "Control sat info msg number, 0:no limit",
+              "bm_upd_valid_bit": 69
+            },
+			{
+			  "leaf_name": "Special Mode",
+			  "leaf_type": "enum",
+			  "leaf_value_list": "0,1,2",
+			  "leaf_value_text": "Disable,Enhance,Adaptive",
+			  "leaf_value":	0,
+			  "leaf_data_length": 1,
+			  "leaf_comment": "Special Mode",
+			  "bm_upd_valid_bit": 97
+			}
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,253 @@
+{
+    "CheckEfuse":{
+        "Commands":[
+            {
+                "Format": "Status Code",
+                "FormattedOutput": "Attach",
+                "Goto": 20,
+                "Id": 1,
+                "MainType": 4,
+                "ReSend": 3600000,
+                "SubType": 0,
+                "Timeout": 10
+            },
+            {
+                "Format": "Status Code",
+                "FormattedOutput": "write reg59",
+                "Goto": 20,
+                "Id": 2,
+                "MainType": 14,
+                "Parameter": [
+                    "0x1000164",
+                    "0x40"
+                ],
+                "ReSend": 1,
+                "SubType": 0,
+                "Timeout": 1500
+            },
+            {
+                "Format": "Status Code",
+                "FormattedOutput": "check efuse valid bit",
+                "Goto": 20,
+                "Id": 3,
+                "MainType": 14,
+                "Parameter": [
+                    "0x2060000",
+                    "0x80001d01"
+                ],
+                "ReSend": 1,
+                "SubType": 0,
+                "Timeout": 1500,
+                "WaitTimeNextCmd": 10
+            },
+            {
+                "Format": "Status Code",
+                "FormattedOutput": "read efuse",
+                "Goto": 20,
+                "Id": 4,
+                "MainType": 16,
+                "Parameter": [
+                    "0x2060004"
+                ],
+                "ReSend": 3,
+                "SubType": 0,
+                "Timeout": 1500
+            }
+        ]
+    },
+    "Calibration":{
+        "Commands":[
+            {
+                "Format": "Status Code",
+                "FormattedOutput": "write reg58",
+                "Goto": 20,
+                "Id": 4,
+                "MainType": 14,
+                "Parameter": [
+                    "0x1000160",
+                    "0x57e52726"
+                ],
+                "ReSend": 1,
+                "SubType": 0,
+                "Timeout": 1500
+            },
+            {
+                "Format": "Status Code",
+                "FormattedOutput": "write reg5a",
+                "Goto": 20,
+                "Id": 5,
+                "MainType": 14,
+                "Parameter": [
+                    "0x1000168",
+                    "0x10"
+                ],
+                "ReSend": 1,
+                "SubType": 0,
+                "Timeout": 1500
+            },
+            {
+                "Format": "Status Code",
+                "FormattedOutput": "write reg58",
+                "Goto": 20,
+                "Id": 6,
+                "MainType": 14,
+                "Parameter": [
+                    "0x1000160",
+                    "0x17e52726"
+                ],
+                "ReSend": 1,
+                "SubType": 0,
+                "Timeout": 1500
+            },
+            {
+                "Format": "Status Code",
+                "FormattedOutput": "write reg58",
+                "Goto": 20,
+                "Id": 7,
+                "MainType": 14,
+                "Parameter": [
+                    "0x1000160",
+                    "0x7e52726"
+                ],
+                "ReSend": 1,
+                "SubType": 0,
+                "Timeout": 1500,
+                "WaitTimeNextCmd": 20
+            },
+            {
+                "Format": "Status Code",
+                "FormattedOutput": "write reg58",
+                "Goto": 20,
+                "Id": 8,
+                "MainType": 14,
+                "Parameter": [
+                    "0x1000160",
+                    "0x27e52726"
+                ],
+                "ReSend": 1,
+                "SubType": 0,
+                "Timeout": 1500,
+                "WaitTimeNextCmd": 1
+            },
+            {
+                "Format": "Status Code",
+                "FormattedOutput": "write reg58",
+                "Goto": 20,
+                "Id": 9,
+                "MainType": 14,
+                "Parameter": [
+                    "0x1000160",
+                    "0x7e52726"
+                ],
+                "ReSend": 1,
+                "SubType": 0,
+                "Timeout": 1500,
+                "WaitTimeNextCmd": 30
+            },
+            {
+                "Format": "Status Code",
+                "FormattedOutput": "read reg33",
+                "Goto": 20,
+                "Id": 10,
+                "MainType": 16,
+                "Parameter": [
+                    "0x10000cc"
+                ],
+                "ReSend": 1,
+                "SubType": 0,
+                "Timeout": 1500
+            },
+            {
+                "Format": "Status Code",
+                "FormattedOutput": "write reg 0x1000160",
+                "Goto": 20,
+                "Id": 11,
+                "MainType": 14,
+                "Parameter": [
+                    "0x1000160",
+                    "0"
+                ],
+                "ReSend": 1,
+                "SubType": 0,
+                "Timeout": 1500
+            },
+            {
+                "Format": "Status Code",
+                "FormattedOutput": "write reg59",
+                "Goto": 20,
+                "Id": 12,
+                "MainType": 14,
+                "Parameter": [
+                    "0x1000164",
+                    "0x4000240"
+                ],
+                "ReSend": 1,
+                "SubType": 0,
+                "Timeout": 1500
+            }
+         ]
+    },
+    "WriteEfuse":{
+        "Commands":[
+            {
+                "Format": "Status Code",
+                "FormattedOutput": "write efuse reg",
+                "Goto": 20,
+                "Id": 15,
+                "MainType": 14,
+                "Parameter": [
+                    "0x2060000",
+                    "0x80001d03"
+                ],
+                "ReSend": 1,
+                "SubType": 0,
+                "Timeout": 1500,
+                "WaitTimeNextCmd": 5
+            },
+            {
+                "Format": "Status Code",
+                "FormattedOutput": "prepare read efuse",
+                "Goto": 20,
+                "Id": 16,
+                "MainType": 14,
+                "Parameter": [
+                    "0x2060000",
+                    "0x80001d01"
+                ],
+                "ReSend": 1,
+                "SubType": 0,
+                "Timeout": 1500,
+                "WaitTimeNextCmd": 5
+             },
+             {
+                 "Format": "Status Code",
+                 "FormattedOutput": "read efuse",
+                 "Goto": 20,
+                 "Id": 17,
+                 "MainType": 16,
+                 "Parameter": [
+                     "0x2060004"
+                 ],
+                 "ReSend": 3,
+                 "SubType": 0,
+                 "Timeout": 1500
+            }
+        ]
+    },
+
+    "Release": {
+        "Commands":
+         [
+             {
+                "Format": "Status Code",
+                "FormattedOutput": "Releasing",
+                "Goto": 7,
+                "Id": 6,
+                "MainType": 4,
+                "ReSend": 3,
+                "SubType": 1,
+                "Timeout": 100
+             }
+        ]
+    }
+}

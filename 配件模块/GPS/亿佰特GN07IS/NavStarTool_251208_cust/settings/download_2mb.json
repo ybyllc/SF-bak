@@ -1,0 +1,691 @@
+{
+    "BinFile": "",
+    "Commands": [
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Attach",
+            "Goto": 46,
+            "Id": 1,
+            "MainType": 4,
+            "ReSend": 3600000,
+            "SubType": 0,
+            "Timeout": 10
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Uart set",
+            "Goto": 3,
+            "Id": 2,
+            "MainType": 2,
+            "Parameter": [
+                "768",
+                "2000000",
+                "5000",
+                "10000",
+                "2000000"
+            ],
+            "ReSend": 0,
+            "SubType": 3,
+            "Timeout": 5000
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "UART ACK",
+            "Goto": 46,
+            "Id": 3,
+            "MainType": 2,
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 5000
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 4,
+            "MainType": 12,
+            "Parameter": [
+                "0",
+                "216",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 5,
+            "MainType": 12,
+            "Parameter": [
+                "65536",
+                "216",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 6,
+            "MainType": 12,
+            "Parameter": [
+                "131072",
+                "216",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 7,
+            "MainType": 12,
+            "Parameter": [
+                "196608",
+                "216",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 8,
+            "MainType": 12,
+            "Parameter": [
+                "262144",
+                "216",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 9,
+            "MainType": 12,
+            "Parameter": [
+                "327680",
+                "216",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 10,
+            "MainType": 12,
+            "Parameter": [
+                "393216",
+                "216",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 11,
+            "MainType": 12,
+            "Parameter": [
+                "458752",
+                "216",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 12,
+            "MainType": 12,
+            "Parameter": [
+                "524288",
+                "216",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 13,
+            "MainType": 12,
+            "Parameter": [
+                "589824",
+                "216",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 14,
+            "MainType": 12,
+            "Parameter": [
+                "655360",
+                "216",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 15,
+            "MainType": 12,
+            "Parameter": [
+                "720896",
+                "216",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 16,
+            "MainType": 12,
+            "Parameter": [
+                "786432",
+                "216",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 17,
+            "MainType": 12,
+            "Parameter": [
+                "851968",
+                "82",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 18,
+            "MainType": 12,
+            "Parameter": [
+                "884736",
+                "32",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 19,
+            "MainType": 12,
+            "Parameter": [
+                "888832",
+                "32",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 20,
+            "MainType": 12,
+            "Parameter": [
+                "892928",
+                "32",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 21,
+            "MainType": 12,
+            "Parameter": [
+                "897024",
+                "32",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 22,
+            "MainType": 12,
+            "Parameter": [
+                "901120",
+                "32",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 23,
+            "MainType": 12,
+            "Parameter": [
+                "905216",
+                "32",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 24,
+            "MainType": 12,
+            "Parameter": [
+                "970496",
+                "216",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 25,
+            "MainType": 12,
+            "Parameter": [
+                "1036032",
+                "216",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 26,
+            "MainType": 12,
+            "Parameter": [
+                "1101568",
+                "216",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 27,
+            "MainType": 12,
+            "Parameter": [
+                "1167104",
+                "216",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 28,
+            "MainType": 12,
+            "Parameter": [
+                "1232640",
+                "216",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 29,
+            "MainType": 12,
+            "Parameter": [
+                "1298176",
+                "216",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 30,
+            "MainType": 12,
+            "Parameter": [
+                "1363712",
+                "216",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 31,
+            "MainType": 12,
+            "Parameter": [
+                "1429248",
+                "216",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 32,
+            "MainType": 12,
+            "Parameter": [
+                "1494784",
+                "216",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 33,
+            "MainType": 12,
+            "Parameter": [
+                "1560320",
+                "216",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 34,
+            "MainType": 12,
+            "Parameter": [
+                "1625856",
+                "216",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 35,
+            "MainType": 12,
+            "Parameter": [
+                "1691392",
+                "216",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 36,
+            "MainType": 12,
+            "Parameter": [
+                "1756928",
+                "216",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 37,
+            "MainType": 12,
+            "Parameter": [
+                "1822464",
+                "216",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 38,
+            "MainType": 12,
+            "Parameter": [
+                "1888000",
+                "216",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 39,
+            "MainType": 12,
+            "Parameter": [
+                "1953536",
+                "216",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 40,
+            "MainType": 12,
+            "Parameter": [
+                "2019072",
+                "216",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 41,
+            "MainType": 12,
+            "Parameter": [
+                "2084608",
+                "32",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 42,
+            "MainType": 12,
+            "Parameter": [
+                "2088704",
+                "32",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash Erasing",
+            "Goto": 46,
+            "Id": 43,
+            "MainType": 12,
+            "Parameter": [
+                "2092800",
+                "32",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 4,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Percentage",
+            "FormattedOutput": "Bin Downloading",
+            "Goto": 46,
+            "Id": 44,
+            "MainType": 12,
+            "Parameter": [
+                "0",
+                "3840",
+                "0"
+            ],
+            "ReSend": 3,
+            "SubType": 5,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Percentage",
+            "FormattedOutput": "Bin Verifying",
+            "Goto": 46,
+            "Id": 45,
+            "MainType": 12,
+            "Parameter": [
+                "0",
+                "4096",
+                "0"
+            ],
+            "ReSend": 10,
+            "SubType": 0,
+            "Timeout": 1500
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Releasing",
+            "Goto": 46,
+            "Id": 46,
+            "MainType": 4,
+            "ReSend": 3,
+            "SubType": 1,
+            "Timeout": 1500
+        }
+    ],
+    "EnableFlashCheck": true,
+    "EnableNvErasing": true,
+    "EnablePortDetect": true,
+    "EnableSettingErasing": false,
+    "EnableWriteBack": true,
+    "HashFormatFile": "",
+    "MaxBaudRate": 2000000,
+    "MinBaudRate": 9600,
+    "Name": "Download"
+}

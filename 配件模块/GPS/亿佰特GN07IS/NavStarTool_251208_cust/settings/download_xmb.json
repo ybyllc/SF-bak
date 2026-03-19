@@ -1,0 +1,161 @@
+{
+    "BinFile": "",
+    "Commands": [
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Attach",
+            "Goto": 9,
+            "Id": 1,
+            "MainType": 4,
+            "ReSend": 3600000,
+            "SubType": 0,
+            "Timeout": 10
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Flash_id_read",
+            "Goto": 8,
+            "Id": 2,
+            "MainType": 12,
+            "Parameter": [
+                "0",
+                "65537",
+                "200000",
+                "2667577344"
+            ],
+            "ReSend": 1,
+            "SubType": 10,
+            "Timeout": 1000
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Config Register",
+            "Goto": 9,
+            "Id": 2,
+            "MainType": 12,
+            "Parameter": [
+                "0",
+                "1",
+                "2000",
+                "1342177280"
+            ],
+            "ReSend": 1,
+            "SubType": 10,
+            "Timeout": 1000,
+            "WaitTimeNextCmd": 200
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Config Register",
+            "Goto": 9,
+            "Id": 3,
+            "MainType": 12,
+            "Parameter": [
+                "0",
+                "3",
+                "200000",
+                "16777216"
+            ],
+            "ReSend": 1,
+            "SubType": 10,
+            "Timeout": 1000
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Uart set",
+            "Goto": 9,
+            "Id": 4,
+            "MainType": 2,
+            "Parameter": [
+                "768",
+                "2000000",
+                "5000",
+                "10000",
+                "2000000"
+            ],
+            "ReSend": 0,
+            "SubType": 3,
+            "Timeout": 750
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "UART ACK",
+            "Goto": 9,
+            "Id": 5,
+            "MainType": 2,
+            "ReSend": 1,
+            "SubType": 4,
+            "Timeout": 50
+        },
+        {
+            "Format": "Percentage",
+            "FormattedOutput": "Bin Download step 1",
+            "Goto": 9,
+            "Id": 6,
+            "MainType": 12,
+            "Parameter": [
+                "0",
+                "4096",
+                "0"
+            ],
+            "ReSend": 10,
+            "SubType": 0,
+            "Timeout": 2000
+        },
+        {
+            "Format": "Percentage",
+            "FormattedOutput": "Bin Download step 2",
+            "Goto": 9,
+            "Id": 7,
+            "MainType": 12,
+            "Parameter": [
+                "0",
+                "4096",
+                "0"
+            ],
+            "ReSend": 1,
+            "SubType": 4,
+            "Timeout": 2000
+        },
+        {
+            "Format": "Percentage",
+            "FormattedOutput": "Bin Download step 3",
+            "Goto": 9,
+            "Id": 8,
+            "MainType": 12,
+            "Parameter": [
+                "0",
+                "2048",
+                "0"
+            ],
+            "ReSend": 1,
+            "SubType": 5,
+            "Timeout": 2000
+        },
+        {
+            "Format": "Status Code",
+            "FormattedOutput": "Releasing",
+            "Goto": 9,
+            "Id": 9,
+            "MainType": 4,
+            "ReSend": 3,
+            "SubType": 1,
+            "Timeout": 1500
+        }
+    ],
+    "EnableFlashCheck": true,
+    "EnableNvErasing": true,
+    "EnablePortDetect": true,
+    "EnableSettingErasing": false,
+    "EnableWriteBack": true,
+    "HashFormatFile": "",
+    "MaxBaudRate": 2000000,
+    "MinBaudRate": 9600,
+    "Name": "Download",
+    "NvSections": [
+        1
+    ],
+    "SettingSections": [
+        3
+    ]
+}
