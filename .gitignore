@@ -1,1 +1,4 @@
 .DS_Store
+node_modules/
+*.log
+履带电动平台-室外导航/exports/

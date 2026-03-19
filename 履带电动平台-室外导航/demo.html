@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>无人车监控系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 添加 html2canvas 库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Share+Tech+Mono&display=swap');
+        
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-green: #0aff00;
+            --neon-red: #ff003c;
+            --neon-yellow: #ffee00;
+            --dark-bg: #0a0a0f;
+            --panel-bg: rgba(16, 20, 30, 0.9);
+        }
+        
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background: var(--dark-bg);
+            color: #e0e0e0;
+            overflow: hidden;
+        }
+        
+        .tech-font {
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .glass-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
+        }
+        
+        .nav-btn {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, transparent, rgba(0, 243, 255, 0.3), transparent);
+            transition: width 0.5s;
+        }
+        
+        .nav-btn:hover::before {
+            width: 100%;
+        }
+        
+        .nav-btn.active {
+            background: rgba(0, 243, 255, 0.15);
+            border-left: 4px solid var(--neon-blue);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+        }
+        
+        .nav-btn.active i {
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px var(--neon-blue);
+        }
+        
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+        
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 2px;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 10px currentColor;
+        }
+        
+        .emergency-btn {
+            background: linear-gradient(135deg, #ff003c 0%, #cc0030 100%);
+            box-shadow: 0 0 30px rgba(255, 0, 60, 0.5);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 30px rgba(255, 0, 60, 0.5); }
+            50% { box-shadow: 0 0 50px rgba(255, 0, 60, 0.8); }
+        }
+        
+        .emergency-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 60px rgba(255, 0, 60, 0.9);
+        }
+        
+        .map-container {
+            background: #1a1a2e;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .grid-overlay {
+            background-image: 
+                linear-gradient(rgba(0, 243, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        
+        .radar-sweep {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: conic-gradient(from 0deg, transparent 0deg, rgba(0, 243, 255, 0.1) 60deg, transparent 60deg);
+            animation: radar 4s linear infinite;
+            border-radius: 50%;
+        }
+        
+        @keyframes radar {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .obstacle {
+            position: absolute;
+            background: var(--neon-red);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--neon-red);
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        
+        .vehicle-icon {
+            filter: drop-shadow(0 0 10px var(--neon-blue));
+        }
+        
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: rgba(0, 243, 255, 0.5);
+            animation: scan 3s linear infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes scan {
+            0% { top: 0; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+        
+        .data-value {
+            text-shadow: 0 0 5px currentColor;
+        }
+        
+        .corner-marker {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--neon-blue);
+        }
+        
+        .corner-tl { top: -2px; left: -2px; border-right: 0; border-bottom: 0; }
+        .corner-tr { top: -2px; right: -2px; border-left: 0; border-bottom: 0; }
+        .corner-bl { bottom: -2px; left: -2px; border-right: 0; border-top: 0; }
+        .corner-br { bottom: -2px; right: -2px; border-left: 0; border-top: 0; }
+        
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+        
+        .status-online { background: var(--neon-green); box-shadow: 0 0 8px var(--neon-green); }
+        .status-warning { background: var(--neon-yellow); box-shadow: 0 0 8px var(--neon-yellow); }
+        .status-danger { background: var(--neon-red); box-shadow: 0 0 8px var(--neon-red); }
+        
+        .gauge-circle {
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+        
+        .gauge-fill {
+            transition: stroke-dashoffset 0.5s ease;
+        }
+
+        /* 导出预览模态框样式 */
+        .export-modal {
+            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.9);
+        }
+        
+        .export-preview {
+            max-height: 70vh;
+            overflow: auto;
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.3);
+        }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col">
+
+    <!-- 顶部状态栏 -->
+    <header class="h-16 glass-panel flex items-center justify-between px-6 z-20 border-b border-cyan-500/30" id="header-bar">
+        <div class="flex items-center space-x-4">
+            <i class="fas fa-car-side text-3xl text-cyan-400"></i>
+            <div>
+                <h1 class="tech-font text-xl font-bold text-cyan-400 tracking-wider">AUTONOMOUS VEHICLE</h1>
+                <p class="text-xs text-gray-400">监控系统 V2.0 | 车辆编号: AV-2024-001</p>
+            </div>
+        </div>
+        
+        <div class="flex items-center space-x-6">
+            <!-- 导出按钮组 -->
+            <div class="flex items-center space-x-2 mr-4 border-r border-gray-600 pr-6">
+                <button onclick="exportFullScreen()" class="px-3 py-2 bg-cyan-500/20 border border-cyan-500 rounded hover:bg-cyan-500/30 transition-colors text-sm flex items-center space-x-2">
+                    <i class="fas fa-camera"></i>
+                    <span>全屏截图</span>
+                </button>
+                <button onclick="exportCurrentView()" class="px-3 py-2 bg-purple-500/20 border border-purple-500 rounded hover:bg-purple-500/30 transition-colors text-sm flex items-center space-x-2">
+                    <i class="fas fa-crop"></i>
+                    <span>当前视图</span>
+                </button>
+                <button onclick="showExportOptions()" class="px-3 py-2 bg-gray-700 border border-gray-500 rounded hover:bg-gray-600 transition-colors text-sm">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+
+            <div class="flex items-center space-x-2">
+                <span class="status-indicator status-online"></span>
+                <span class="text-sm">系统正常</span>
+            </div>
+            <div class="text-right">
+                <div id="clock" class="text-xl font-bold text-cyan-400">00:00:00</div>
+                <div id="date" class="text-xs text-gray-400">2024-01-01</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <div class="flex-1 flex overflow-hidden" id="main-container">
+        
+        <!-- 左侧内容显示区 -->
+        <main class="flex-1 relative bg-gray-900 p-6 overflow-hidden" id="content-area">
+            
+            <!-- 主界面 -->
+            <div id="view-main" class="view-section h-full flex flex-col space-y-6">
+                <div class="grid grid-cols-3 gap-6 h-full">
+                    <!-- 速度表 -->
+                    <div class="glass-panel rounded-lg p-6 flex flex-col items-center justify-center relative overflow-hidden" id="component-speed">
+                        <div class="corner-marker corner-tl"></div>
+                        <div class="corner-marker corner-tr"></div>
+                        <div class="corner-marker corner-bl"></div>
+                        <div class="corner-marker corner-br"></div>
+                        
+                        <h3 class="tech-font text-lg mb-4 text-cyan-400">当前速度</h3>
+                        <div class="relative w-48 h-48">
+                            <svg class="w-full h-full transform -rotate-90">
+                                <circle cx="96" cy="96" r="88" stroke="rgba(255,255,255,0.1)" stroke-width="12" fill="none"/>
+                                <circle id="speed-circle" cx="96" cy="96" r="88" stroke="#00f3ff" stroke-width="12" fill="none" 
+                                    stroke-dasharray="553" stroke-dashoffset="200" stroke-linecap="round" class="gauge-fill"/>
+                            </svg>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                <span id="speed-value" class="text-5xl font-bold tech-font text-white">45</span>
+                                <span class="text-sm text-gray-400 mt-1">km/h</span>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex space-x-4 text-sm">
+                            <div class="text-center">
+                                <div class="text-gray-400">巡航</div>
+                                <div class="text-green-400">ON</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-gray-400">档位</div>
+                                <div class="text-cyan-400">D</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 中央摄像头视图 -->
+                    <div class="glass-panel rounded-lg p-1 flex flex-col relative overflow-hidden col-span-2" id="component-camera">
+                        <div class="absolute top-4 left-4 z-10 bg-black/50 px-3 py-1 rounded text-xs border border-cyan-500/30">
+                            <i class="fas fa-video mr-2 text-red-500 animate-pulse"></i>LIVE CAMERA
+                        </div>
+                        <div class="flex-1 bg-black rounded relative overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/50"></div>
+                            <div class="scan-line"></div>
+                            <!-- 模拟道路场景 -->
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="w-full h-full relative" style="background: linear-gradient(to bottom, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);">
+                                    <!-- 道路 -->
+                                    <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-96 h-full" style="background: #2a2a3e; clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);">
+                                        <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-2 h-full bg-yellow-500/30" style="background-image: repeating-linear-gradient(to bottom, transparent 0px, transparent 40px, #fbbf24 40px, #fbbf24 80px);"></div>
+                                    </div>
+                                    <!-- 车道线 -->
+                                    <div class="absolute bottom-0 left-1/4 w-1 h-full bg-white/20 transform -skew-x-12"></div>
+                                    <div class="absolute bottom-0 right-1/4 w-1 h-full bg-white/20 transform skew-x-12"></div>
+                                </div>
+                            </div>
+                            <!-- HUD 叠加信息 -->
+                            <div class="absolute bottom-4 left-4 right-4 flex justify-between text-xs">
+                                <div class="bg-black/70 px-3 py-2 rounded border border-cyan-500/30">
+                                    <div class="text-gray-400">车道保持</div>
+                                    <div class="text-green-400 font-bold">已启用</div>
+                                </div>
+                                <div class="bg-black/70 px-3 py-2 rounded border border-cyan-500/30">
+                                    <div class="text-gray-400">前车距离</div>
+                                    <div class="text-yellow-400 font-bold">25.5m</div>
+                                </div>
+                                <div class="bg-black/70 px-3 py-2 rounded border border-cyan-500/30">
+                                    <div class="text-gray-400">识别目标</div>
+                                    <div class="text-cyan-400 font-bold">3个</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 底部状态栏 -->
+                <div class="grid grid-cols-4 gap-4" id="component-status">
+                    <div class="glass-panel p-4 rounded flex items-center space-x-3">
+                        <i class="fas fa-battery-three-quarters text-2xl text-green-400"></i>
+                        <div>
+                            <div class="text-xs text-gray-400">电池电量</div>
+                            <div class="text-lg font-bold text-white">78%</div>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-4 rounded flex items-center space-x-3">
+                        <i class="fas fa-route text-2xl text-cyan-400"></i>
+                        <div>
+                            <div class="text-xs text-gray-400">剩余里程</div>
+                            <div class="text-lg font-bold text-white">142km</div>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-4 rounded flex items-center space-x-3">
+                        <i class="fas fa-thermometer-half text-2xl text-yellow-400"></i>
+                        <div>
+                            <div class="text-xs text-gray-400">电机温度</div>
+                            <div class="text-lg font-bold text-white">65°C</div>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-4 rounded flex items-center space-x-3">
+                        <i class="fas fa-wifi text-2xl text-blue-400"></i>
+                        <div>
+                            <div class="text-xs text-gray-400">5G信号</div>
+                            <div class="text-lg font-bold text-white">-65dBm</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GPS定位界面 -->
+            <div id="view-gps" class="view-section hidden h-full flex flex-col">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="tech-font text-2xl text-cyan-400">GPS定位系统</h2>
+                    <div class="flex space-x-2">
+                        <button onclick="addMarker()" class="px-4 py-2 bg-cyan-500/20 border border-cyan-500 rounded hover:bg-cyan-500/30 transition-colors text-sm">
+                            <i class="fas fa-map-marker-alt mr-2"></i>打点标记
+                        </button>
+                        <button onclick="clearMarkers()" class="px-4 py-2 bg-red-500/20 border border-red-500 rounded hover:bg-red-500/30 transition-colors text-sm">
+                            <i class="fas fa-trash mr-2"></i>清除标记
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="flex-1 glass-panel rounded-lg relative overflow-hidden map-container" id="component-map">
+                    <div class="absolute inset-0 grid-overlay opacity-30"></div>
+                    
+                    <!-- 地图标记 -->
+                    <div id="map-markers">
+                        <!-- 当前位置 -->
+                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
+                            <div class="relative">
+                                <div class="w-6 h-6 bg-cyan-400 rounded-full animate-ping absolute"></div>
+                                <div class="w-6 h-6 bg-cyan-400 rounded-full border-2 border-white relative z-10 flex items-center justify-center">
+                                    <i class="fas fa-car text-xs text-black"></i>
+                                </div>
+                                <div class="absolute top-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap bg-black/80 px-2 py-1 rounded text-xs border border-cyan-500">
+                                    当前位置
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 坐标信息面板 -->
+                    <div class="absolute top-4 right-4 glass-panel p-4 rounded border border-cyan-500/30 min-w-[250px]">
+                        <h3 class="text-cyan-400 font-bold mb-3 text-sm uppercase tracking-wider">定位信息</h3>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">纬度:</span>
+                                <span id="lat-value" class="text-white font-mono">31.2304°N</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">经度:</span>
+                                <span id="lng-value" class="text-white font-mono">121.4737°E</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">海拔:</span>
+                                <span class="text-white font-mono">12.5m</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">精度:</span>
+                                <span class="text-green-400 font-mono">±1.2m</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">卫星数:</span>
+                                <span class="text-cyan-400 font-mono">14颗</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">航向:</span>
+                                <span class="text-yellow-400 font-mono">NE 45°</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 路径规划信息 -->
+                    <div class="absolute bottom-4 left-4 glass-panel p-4 rounded border border-cyan-500/30">
+                        <div class="flex items-center space-x-4">
+                            <div class="text-center">
+                                <div class="text-xs text-gray-400">目的地</div>
+                                <div class="text-lg font-bold text-white">科技园</div>
+                            </div>
+                            <i class="fas fa-arrow-right text-cyan-400"></i>
+                            <div class="text-center">
+                                <div class="text-xs text-gray-400">剩余距离</div>
+                                <div class="text-lg font-bold text-cyan-400">3.2km</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-xs text-gray-400">预计时间</div>
+                                <div class="text-lg font-bold text-green-400">8min</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 避障监测界面 -->
+            <div id="view-obstacle" class="view-section hidden h-full flex flex-col">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="tech-font text-2xl text-cyan-400">超声波避障监测系统</h2>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                            <span class="text-sm text-gray-300">安全</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+                            <span class="text-sm text-gray-300">警告</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                            <span class="text-sm text-gray-300">危险</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex-1 grid grid-cols-2 gap-6">
+                    <!-- 左侧：车辆包络图 -->
+                    <div class="glass-panel rounded-lg p-6 relative flex items-center justify-center" id="component-radar">
+                        <div class="corner-marker corner-tl"></div>
+                        <div class="corner-marker corner-tr"></div>
+                        <div class="corner-marker corner-bl"></div>
+                        <div class="corner-marker corner-br"></div>
+                        
+                        <h3 class="absolute top-4 left-4 text-sm text-gray-400">实时鸟瞰图</h3>
+                        
+                        <div class="relative w-80 h-96">
+                            <!-- 雷达扫描效果 -->
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="w-64 h-64 border border-cyan-500/20 rounded-full absolute"></div>
+                                <div class="w-48 h-48 border border-cyan-500/20 rounded-full absolute"></div>
+                                <div class="w-32 h-32 border border-cyan-500/20 rounded-full absolute"></div>
+                                <div class="radar-sweep w-64 h-64"></div>
+                            </div>
+
+                            <!-- 车辆本体 -->
+                            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-40 bg-gradient-to-b from-gray-700 to-gray-800 rounded-lg border-2 border-cyan-400 shadow-lg z-10 flex items-center justify-center">
+                                <div class="text-center">
+                                    <i class="fas fa-car text-2xl text-cyan-400 mb-1"></i>
+                                    <div class="text-xs text-gray-400">AV-001</div>
+                                </div>
+                                <!-- 传感器点 -->
+                                <div class="absolute -top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+                                <div class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+                                <div class="absolute top-1/2 -left-1 transform -translate-y-1/2 w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+                                <div class="absolute top-1/2 -right-1 transform -translate-y-1/2 w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+                            </div>
+
+                            <!-- 障碍物 -->
+                            <div class="obstacle w-4 h-4 absolute top-10 left-1/2 transform -translate-x-1/2" style="background: var(--neon-red);"></div>
+                            <div class="obstacle w-3 h-3 absolute bottom-20 right-10" style="background: var(--neon-yellow);"></div>
+                            
+                            <!-- 距离标注线 -->
+                            <svg class="absolute inset-0 w-full h-full pointer-events-none">
+                                <line x1="50%" y1="20%" x2="50%" y2="35%" stroke="#ff003c" stroke-width="2" stroke-dasharray="4"/>
+                                <text x="52%" y="28%" fill="#ff003c" font-size="12">0.8m</text>
+                                
+                                <line x1="75%" y1="75%" x2="60%" y2="65%" stroke="#ffee00" stroke-width="2" stroke-dasharray="4"/>
+                                <text x="70%" y="72%" fill="#ffee00" font-size="12">1.5m</text>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- 右侧：四个角的测距显示 -->
+                    <div class="glass-panel rounded-lg p-6 flex flex-col justify-between" id="component-sensors">
+                        <h3 class="text-sm text-gray-400 mb-4">四角超声波传感器数据</h3>
+                        
+                        <div class="space-y-6">
+                            <!-- 前左 -->
+                            <div class="bg-black/30 p-4 rounded border border-gray-700">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm text-gray-300"><i class="fas fa-location-arrow mr-2 transform -rotate-45"></i>前左传感器</span>
+                                    <span id="fl-value" class="text-xl font-bold text-red-500 data-value">0.8m</span>
+                                </div>
+                                <div class="progress-bar h-3 bg-gray-800 rounded-full">
+                                    <div id="fl-bar" class="progress-fill bg-gradient-to-r from-red-600 to-red-400 h-full rounded-full" style="width: 90%;"></div>
+                                </div>
+                                <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                    <span>0m</span>
+                                    <span>2m</span>
+                                    <span>4m</span>
+                                </div>
+                            </div>
+
+                            <!-- 前右 -->
+                            <div class="bg-black/30 p-4 rounded border border-gray-700">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm text-gray-300"><i class="fas fa-location-arrow mr-2 transform rotate-45"></i>前右传感器</span>
+                                    <span id="fr-value" class="text-xl font-bold text-green-500 data-value">3.2m</span>
+                                </div>
+                                <div class="progress-bar h-3 bg-gray-800 rounded-full">
+                                    <div id="fr-bar" class="progress-fill bg-gradient-to-r from-green-600 to-green-400 h-full rounded-full" style="width: 20%;"></div>
+                                </div>
+                                <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                    <span>0m</span>
+                                    <span>2m</span>
+                                    <span>4m</span>
+                                </div>
+                            </div>
+
+                            <!-- 后左 -->
+                            <div class="bg-black/30 p-4 rounded border border-gray-700">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm text-gray-300"><i class="fas fa-location-arrow mr-2 transform -rotate-135"></i>后左传感器</span>
+                                    <span id="bl-value" class="text-xl font-bold text-yellow-500 data-value">1.5m</span>
+                                </div>
+                                <div class="progress-bar h-3 bg-gray-800 rounded-full">
+                                    <div id="bl-bar" class="progress-fill bg-gradient-to-r from-yellow-600 to-yellow-400 h-full rounded-full" style="width: 60%;"></div>
+                                </div>
+                                <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                    <span>0m</span>
+                                    <span>2m</span>
+                                    <span>4m</span>
+                                </div>
+                            </div>
+
+                            <!-- 后右 -->
+                            <div class="bg-black/30 p-4 rounded border border-gray-700">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm text-gray-300"><i class="fas fa-location-arrow mr-2 transform rotate-135"></i>后右传感器</span>
+                                    <span id="br-value" class="text-xl font-bold text-green-500 data-value">4.0m</span>
+                                </div>
+                                <div class="progress-bar h-3 bg-gray-800 rounded-full">
+                                    <div id="br-bar" class="progress-fill bg-gradient-to-r from-green-600 to-green-400 h-full rounded-full" style="width: 5%;"></div>
+                                </div>
+                                <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                    <span>0m</span>
+                                    <span>2m</span>
+                                    <span>4m</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 系统状态 -->
+                        <div class="mt-6 p-4 bg-cyan-900/20 border border-cyan-500/30 rounded">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-cyan-400">系统状态</span>
+                                <span class="text-sm font-bold text-white">自动避障已启用</span>
+                            </div>
+                            <div class="mt-2 text-xs text-gray-400">
+                                检测到前方障碍物，已自动减速。建议接管或等待障碍物移除。
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 车辆信息界面 -->
+            <div id="view-info" class="view-section hidden h-full flex flex-col">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="tech-font text-2xl text-cyan-400">车辆详细信息</h2>
+                    <button onclick="exportComponent('view-info')" class="px-4 py-2 bg-cyan-500/20 border border-cyan-500 rounded hover:bg-cyan-500/30 transition-colors text-sm">
+                        <i class="fas fa-download mr-2"></i>导出此页
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-6 flex-1 overflow-y-auto" id="component-vehicle-info">
+                    <!-- 动力系统 -->
+                    <div class="glass-panel rounded-lg p-6">
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-bolt text-2xl text-yellow-400 mr-3"></i>
+                            <h3 class="text-lg font-bold">动力系统</h3>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-gray-400">电机功率</span>
+                                    <span class="text-white">150kW</span>
+                                </div>
+                                <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
+                                    <div class="h-full bg-yellow-400 w-3/4"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-gray-400">扭矩输出</span>
+                                    <span class="text-white">310Nm</span>
+                                </div>
+                                <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
+                                    <div class="h-full bg-yellow-400 w-1/2"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-gray-400">电机温度</span>
+                                    <span class="text-yellow-400">65°C</span>
+                                </div>
+                                <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
+                                    <div class="h-full bg-yellow-400 w-3/5"></div>
+                                </div>
+                            </div>
+                            <div class="pt-4 border-t border-gray-700">
+                                <div class="grid grid-cols-2 gap-4 text-center">
+                                    <div>
+                                        <div class="text-2xl font-bold text-white">98%</div>
+                                        <div class="text-xs text-gray-400">电机效率</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-2xl font-bold text-white">12kWh</div>
+                                        <div class="text-xs text-gray-400">百公里能耗</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 电池系统 -->
+                    <div class="glass-panel rounded-lg p-6">
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-battery-full text-2xl text-green-400 mr-3"></i>
+                            <h3 class="text-lg font-bold">电池系统</h3>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-center py-4">
+                                <div class="relative w-32 h-48 border-4 border-gray-600 rounded-2xl p-2">
+                                    <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 w-12 h-4 bg-gray-600 rounded-t-lg"></div>
+                                    <div class="w-full h-full bg-gray-800 rounded-xl overflow-hidden relative">
+                                        <div class="absolute bottom-0 w-full bg-gradient-to-t from-green-600 to-green-400 transition-all duration-1000" style="height: 78%;"></div>
+                                        <div class="absolute inset-0 flex items-center justify-center">
+                                            <span class="text-2xl font-bold text-white z-10">78%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div class="bg-black/30 p-2 rounded text-center">
+                                    <div class="text-gray-400">电压</div>
+                                    <div class="text-green-400 font-bold">403.2V</div>
+                                </div>
+                                <div class="bg-black/30 p-2 rounded text-center">
+                                    <div class="text-gray-400">电流</div>
+                                    <div class="text-green-400 font-bold">42.5A</div>
+                                </div>
+                                <div class="bg-black/30 p-2 rounded text-center">
+                                    <div class="text-gray-400">温度</div>
+                                    <div class="text-yellow-400 font-bold">32°C</div>
+                                </div>
+                                <div class="bg-black/30 p-2 rounded text-center">
+                                    <div class="text-gray-400">循环</div>
+                                    <div class="text-white font-bold">1,245次</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 自动驾驶系统 -->
+                    <div class="glass-panel rounded-lg p-6">
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-brain text-2xl text-purple-400 mr-3"></i>
+                            <h3 class="text-lg font-bold">自动驾驶</h3>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-3 bg-black/30 rounded">
+                                <span class="text-sm">激光雷达</span>
+                                <span class="text-green-400 text-sm"><i class="fas fa-check-circle mr-1"></i>正常</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-black/30 rounded">
+                                <span class="text-sm">毫米波雷达</span>
+                                <span class="text-green-400 text-sm"><i class="fas fa-check-circle mr-1"></i>正常</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-black/30 rounded">
+                                <span class="text-sm">摄像头系统</span>
+                                <span class="text-green-400 text-sm"><i class="fas fa-check-circle mr-1"></i>正常</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-black/30 rounded">
+                                <span class="text-sm">超声波传感器</span>
+                                <span class="text-green-400 text-sm"><i class="fas fa-check-circle mr-1"></i>正常</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-black/30 rounded">
+                                <span class="text-sm">GPS/IMU</span>
+                                <span class="text-green-400 text-sm"><i class="fas fa-check-circle mr-1"></i>正常</span>
+                            </div>
+                            
+                            <div class="mt-4 p-3 bg-purple-900/20 border border-purple-500/30 rounded">
+                                <div class="text-xs text-purple-300 mb-1">当前模式</div>
+                                <div class="text-lg font-bold text-white">L4 自动驾驶</div>
+                                <div class="text-xs text-gray-400 mt-1">已持续运行 2小时35分钟</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 底盘系统 -->
+                    <div class="glass-panel rounded-lg p-6 col-span-2">
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-cog text-2xl text-cyan-400 mr-3"></i>
+                            <h3 class="text-lg font-bold">底盘与轮胎</h3>
+                        </div>
+                        <div class="grid grid-cols-4 gap-4">
+                            <div class="text-center p-4 bg-black/20 rounded">
+                                <i class="fas fa-circle text-3xl text-green-400 mb-2"></i>
+                                <div class="text-sm font-bold">左前胎</div>
+                                <div class="text-xs text-gray-400">2.4 bar</div>
+                                <div class="text-xs text-green-400">32°C</div>
+                            </div>
+                            <div class="text-center p-4 bg-black/20 rounded">
+                                <i class="fas fa-circle text-3xl text-green-400 mb-2"></i>
+                                <div class="text-sm font-bold">右前胎</div>
+                                <div class="text-xs text-gray-400">2.4 bar</div>
+                                <div class="text-xs text-green-400">33°C</div>
+                            </div>
+                            <div class="text-center p-4 bg-black/20 rounded">
+                                <i class="fas fa-circle text-3xl text-green-400 mb-2"></i>
+                                <div class="text-sm font-bold">左后胎</div>
+                                <div class="text-xs text-gray-400">2.5 bar</div>
+                                <div class="text-xs text-green-400">31°C</div>
+                            </div>
+                            <div class="text-center p-4 bg-black/20 rounded">
+                                <i class="fas fa-circle text-3xl text-green-400 mb-2"></i>
+                                <div class="text-sm font-bold">右后胎</div>
+                                <div class="text-xs text-gray-400">2.5 bar</div>
+                                <div class="text-xs text-green-400">32°C</div>
+                            </div>
+                        </div>
+                        <div class="mt-4 grid grid-cols-3 gap-4 text-center">
+                            <div class="p-3 bg-black/30 rounded">
+                                <div class="text-xs text-gray-400">悬挂高度</div>
+                                <div class="text-lg font-bold text-white">标准</div>
+                            </div>
+                            <div class="p-3 bg-black/30 rounded">
+                                <div class="text-xs text-gray-400">转向角度</div>
+                                <div class="text-lg font-bold text-white">0°</div>
+                            </div>
+                            <div class="p-3 bg-black/30 rounded">
+                                <div class="text-xs text-gray-400">制动压力</div>
+                                <div class="text-lg font-bold text-white">正常</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 行驶数据 -->
+                    <div class="glass-panel rounded-lg p-6">
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-chart-line text-2xl text-blue-400 mr-3"></i>
+                            <h3 class="text-lg font-bold">行驶统计</h3>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center p-2 bg-black/20 rounded">
+                                <span class="text-sm text-gray-400">总里程</span>
+                                <span class="font-bold">12,456 km</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 bg-black/20 rounded">
+                                <span class="text-sm text-gray-400">本次里程</span>
+                                <span class="font-bold">45.2 km</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 bg-black/20 rounded">
+                                <span class="text-sm text-gray-400">平均速度</span>
+                                <span class="font-bold">38 km/h</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 bg-black/20 rounded">
+                                <span class="text-sm text-gray-400">驾驶时间</span>
+                                <span class="font-bold">1h 12m</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- 右侧导航菜单 -->
+        <nav class="w-64 glass-panel flex flex-col border-l border-cyan-500/30 z-10" id="nav-menu">
+            <div class="p-4 border-b border-cyan-500/20">
+                <h2 class="tech-font text-sm text-gray-400 tracking-widest">功能菜单</h2>
+            </div>
+            
+            <div class="flex-1 py-4 space-y-2">
+                <button onclick="switchTab('main')" id="btn-main" class="nav-btn active w-full text-left px-6 py-4 flex items-center space-x-3 hover:bg-white/5 transition-colors">
+                    <i class="fas fa-dashboard text-xl w-8 text-center"></i>
+                    <div>
+                        <div class="font-bold">主界面</div>
+                        <div class="text-xs text-gray-500">Dashboard</div>
+                    </div>
+                </button>
+                
+                <button onclick="switchTab('gps')" id="btn-gps" class="nav-btn w-full text-left px-6 py-4 flex items-center space-x-3 hover:bg-white/5 transition-colors">
+                    <i class="fas fa-satellite-dish text-xl w-8 text-center"></i>
+                    <div>
+                        <div class="font-bold">GPS定位</div>
+                        <div class="text-xs text-gray-500">Navigation</div>
+                    </div>
+                </button>
+                
+                <button onclick="switchTab('obstacle')" id="btn-obstacle" class="nav-btn w-full text-left px-6 py-4 flex items-center space-x-3 hover:bg-white/5 transition-colors">
+                    <i class="fas fa-radar text-xl w-8 text-center"></i>
+                    <div>
+                        <div class="font-bold">避障监测</div>
+                        <div class="text-xs text-gray-500">Obstacle Detection</div>
+                    </div>
+                </button>
+                
+                <button onclick="switchTab('info')" id="btn-info" class="nav-btn w-full text-left px-6 py-4 flex items-center space-x-3 hover:bg-white/5 transition-colors">
+                    <i class="fas fa-microchip text-xl w-8 text-center"></i>
+                    <div>
+                        <div class="font-bold">车辆信息</div>
+                        <div class="text-xs text-gray-500">Vehicle Status</div>
+                    </div>
+                </button>
+            </div>
+            
+            <!-- 系统状态摘要 -->
+            <div class="p-4 border-t border-cyan-500/20 space-y-3 text-xs">
+                <div class="flex justify-between">
+                    <span class="text-gray-400">CPU温度</span>
+                    <span class="text-cyan-400">42°C</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-400">内存占用</span>
+                    <span class="text-green-400">38%</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-400">网络延迟</span>
+                    <span class="text-green-400">12ms</span>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <!-- 底部紧急停车按钮 -->
+    <div class="h-24 glass-panel border-t border-red-500/50 flex items-center justify-center z-30" id="emergency-bar">
+        <button onclick="emergencyStop()" class="emergency-btn px-16 py-4 rounded-full text-white font-bold text-xl tracking-widest flex items-center space-x-3 transition-transform active:scale-95">
+            <i class="fas fa-exclamation-triangle text-2xl animate-bounce"></i>
+            <span>一键紧急停车</span>
+            <i class="fas fa-hand-paper text-2xl"></i>
+        </button>
+    </div>
+
+    <!-- 导出选项模态框 -->
+    <div id="export-options-modal" class="fixed inset-0 export-modal z-50 hidden flex items-center justify-center">
+        <div class="glass-panel p-6 rounded-xl max-w-2xl w-full mx-4 border border-cyan-500/50">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-cyan-400">
+                    <i class="fas fa-download mr-2"></i>导出选项
+                </h3>
+                <button onclick="closeExportOptions()" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <button onclick="exportFullScreen()" class="p-4 bg-cyan-900/30 border border-cyan-500/50 rounded-lg hover:bg-cyan-900/50 transition-colors text-left">
+                    <i class="fas fa-desktop text-2xl text-cyan-400 mb-2"></i>
+                    <div class="font-bold">全屏截图</div>
+                    <div class="text-xs text-gray-400 mt-1">导出整个界面 (1920x1080)</div>
+                </button>
+                
+                <button onclick="exportCurrentView()" class="p-4 bg-purple-900/30 border border-purple-500/50 rounded-lg hover:bg-purple-900/50 transition-colors text-left">
+                    <i class="fas fa-window-maximize text-2xl text-purple-400 mb-2"></i>
+                    <div class="font-bold">当前视图</div>
+                    <div class="text-xs text-gray-400 mt-1">仅导出主内容区域</div>
+                </button>
+                
+                <button onclick="exportComponent('component-speed')" class="p-4 bg-yellow-900/30 border border-yellow-500/50 rounded-lg hover:bg-yellow-900/50 transition-colors text-left">
+                    <i class="fas fa-tachometer-alt text-2xl text-yellow-400 mb-2"></i>
+                    <div class="font-bold">速度仪表</div>
+                    <div class="text-xs text-gray-400 mt-1">导出速度表组件</div>
+                </button>
+                
+                <button onclick="exportComponent('component-radar')" class="p-4 bg-green-900/30 border border-green-500/50 rounded-lg hover:bg-green-900/50 transition-colors text-left">
+                    <i class="fas fa-radar text-2xl text-green-400 mb-2"></i>
+                    <div class="font-bold">雷达视图</div>
+                    <div class="text-xs text-gray-400 mt-1">导出避障雷达图</div>
+                </button>
+            </div>
+
+            <div class="border-t border-gray-700 pt-4">
+                <div class="text-sm text-gray-400 mb-2">导出设置</div>
+                <div class="flex space-x-4">
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" id="export-scale" checked class="form-checkbox text-cyan-500 rounded bg-gray-800 border-gray-600">
+                        <span class="text-sm">2倍分辨率 (高清)</span>
+                    </label>
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" id="export-transparent" class="form-checkbox text-cyan-500 rounded bg-gray-800 border-gray-600">
+                        <span class="text-sm">透明背景</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 导出预览模态框 -->
+    <div id="export-preview-modal" class="fixed inset-0 export-modal z-50 hidden flex items-center justify-center">
+        <div class="glass-panel p-6 rounded-xl max-w-4xl w-full mx-4 border border-cyan-500/50 flex flex-col max-h-[90vh]">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-cyan-400">
+                    <i class="fas fa-image mr-2"></i>导出预览
+                </h3>
+                <button onclick="closeExportPreview()" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="flex-1 overflow-auto bg-gray-900/50 rounded-lg p-4 mb-4 flex items-center justify-center">
+                <img id="preview-image" class="max-w-full max-h-[60vh] object-contain border border-gray-700 rounded" />
+            </div>
+            
+            <div class="flex justify-between items-center">
+                <div class="text-sm text-gray-400">
+                    <span id="export-info">尺寸: 1920 x 1080 | 格式: PNG</span>
+                </div>
+                <div class="space-x-3">
+                    <button onclick="closeExportPreview()" class="px-4 py-2 border border-gray-600 rounded hover:bg-gray-800 transition-colors">
+                        取消
+                    </button>
+                    <button onclick="downloadImage()" class="px-6 py-2 bg-cyan-600 hover:bg-cyan-500 rounded font-bold transition-colors flex items-center space-x-2">
+                        <i class="fas fa-download"></i>
+                        <span>下载 PNG</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 紧急停车弹窗 -->
+    <div id="emergency-modal" class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center">
+        <div class="glass-panel p-8 rounded-2xl max-w-md w-full mx-4 border-2 border-red-500 text-center">
+            <i class="fas fa-exclamation-circle text-6xl text-red-500 mb-4 animate-pulse"></i>
+            <h2 class="text-3xl font-bold text-white mb-2">紧急停车已激活</h2>
+            <p class="text-gray-300 mb-6">车辆正在执行紧急制动程序...</p>
+            <div class="space-y-2 text-left bg-black/50 p-4 rounded mb-6 text-sm">
+                <div class="flex justify-between">
+                    <span class="text-gray-400">制动压力:</span>
+                    <span class="text-red-400 font-bold">100%</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-400">双闪灯:</span>
+                    <span class="text-yellow-400 font-bold">已开启</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-400">危险报警:</span>
+                    <span class="text-red-400 font-bold">已触发</span>
+                </div>
+            </div>
+            <button onclick="closeEmergencyModal()" class="w-full py-3 bg-gray-700 hover:bg-gray-600 rounded text-white font-bold transition-colors">
+                确认并解除警报
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量存储当前导出的图片数据
+        let currentExportData = null;
+
+        // 时钟更新
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').textContent = now.toLocaleTimeString('zh-CN', { hour12: false });
+            document.getElementById('date').textContent = now.toLocaleDateString('zh-CN');
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // 标签切换
+        function switchTab(tabName) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('view-' + tabName).classList.remove('hidden');
+            document.getElementById('btn-' + tabName).classList.add('active');
+        }
+
+        // 显示导出选项
+        function showExportOptions() {
+            document.getElementById('export-options-modal').classList.remove('hidden');
+        }
+
+        function closeExportOptions() {
+            document.getElementById('export-options-modal').classList.add('hidden');
+        }
+
+        // 核心导出功能
+        async function captureElement(elementId, filename) {
+            const element = elementId ? document.getElementById(elementId) : document.body;
+            const scale = document.getElementById('export-scale')?.checked ? 2 : 1;
+            const transparent = document.getElementById('export-transparent')?.checked;
+            
+            try {
+                // 显示加载状态
+                const btn = event?.target;
+                if (btn) {
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>处理中...';
+                    btn.disabled = true;
+                }
+
+                const canvas = await html2canvas(element, {
+                    scale: scale,
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: transparent ? null : '#0a0a0f',
+                    logging: false,
+                    onclone: (clonedDoc) => {
+                        // 可以在这里修改克隆的DOM，比如隐藏某些元素
+                        const clonedElement = elementId ? 
+                            clonedDoc.getElementById(elementId) : 
+                            clonedDoc.body;
+                    }
+                });
+
+                // 转换为图片数据
+                currentExportData = {
+                    dataUrl: canvas.toDataURL('image/png'),
+                    width: canvas.width,
+                    height: canvas.height,
+                    filename: filename || `无人车监控_${new Date().getTime()}.png`
+                };
+
+                // 显示预览
+                showExportPreview();
+
+                if (btn) {
+                    btn.innerHTML = '<i class="fas fa-check mr-2"></i>完成';
+                    setTimeout(() => {
+                        btn.innerHTML = btn.originalText || '导出';
+                        btn.disabled = false;
+                    }, 2000);
+                }
+
+            } catch (error) {
+                console.error('导出失败:', error);
+                alert('导出失败，请重试');
+                if (btn) {
+                    btn.innerHTML = btn.originalText || '导出';
+                    btn.disabled = false;
+                }
+            }
+        }
+
+        // 导出全屏
+        function exportFullScreen() {
+            closeExportOptions();
+            captureElement(null, `无人车监控_全屏_${new Date().getTime()}.png`);
+        }
+
+        // 导出当前视图（主内容区）
+        function exportCurrentView() {
+            closeExportOptions();
+            // 获取当前显示的视图
+            const currentView = document.querySelector('.view-section:not(.hidden)');
+            if (currentView) {
+                captureElement(currentView.id, `无人车监控_${currentView.id}_${new Date().getTime()}.png`);
+            }
+        }
+
+        // 导出特定组件
+        function exportComponent(componentId) {
+            closeExportOptions();
+            const names = {
+                'component-speed': '速度仪表',
+                'component-radar': '雷达视图',
+                'component-sensors': '传感器数据',
+                'component-map': 'GPS地图',
+                'component-camera': '摄像头视图',
+                'view-info': '车辆信息'
+            };
+            const name = names[componentId] || '组件';
+            captureElement(componentId, `无人车监控_${name}_${new Date().getTime()}.png`);
+        }
+
+        // 显示导出预览
+        function showExportPreview() {
+            const modal = document.getElementById('export-preview-modal');
+            const img = document.getElementById('preview-image');
+            const info = document.getElementById('export-info');
+            
+            img.src = currentExportData.dataUrl;
+            info.textContent = `尺寸: ${currentExportData.width} x ${currentExportData.height} | 格式: PNG | 大小: ${(currentExportData.dataUrl.length / 1024 / 1024).toFixed(2)} MB`;
+            
+            modal.classList.remove('hidden');
+        }
+
+        function closeExportPreview() {
+            document.getElementById('export-preview-modal').classList.add('hidden');
+        }
+
+        // 下载图片
+        function downloadImage() {
+            if (!currentExportData) return;
+            
+            const link = document.createElement('a');
+            link.download = currentExportData.filename;
+            link.href = currentExportData.dataUrl;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // 显示成功提示
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check mr-2"></i>已下载';
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                closeExportPreview();
+            }, 1000);
+        }
+
+        // 模拟数据更新
+        function updateSensorData() {
+            const sensors = [
+                { id: 'fl', min: 0.5, max: 4.0 },
+                { id: 'fr', min: 1.0, max: 4.0 },
+                { id: 'bl', min: 1.0, max: 4.0 },
+                { id: 'br', min: 2.0, max: 4.0 }
+            ];
+
+            sensors.forEach(sensor => {
+                const value = (Math.random() * (sensor.max - sensor.min) + sensor.min).toFixed(1);
+                const percentage = (value / 4.0) * 100;
+                
+                const valueEl = document.getElementById(sensor.id + '-value');
+                const barEl = document.getElementById(sensor.id + '-bar');
+                
+                if (valueEl && barEl) {
+                    valueEl.textContent = value + 'm';
+                    barEl.style.width = percentage + '%';
+                    
+                    if (value < 1.0) {
+                        valueEl.className = 'text-xl font-bold text-red-500 data-value';
+                        barEl.className = 'progress-fill bg-gradient-to-r from-red-600 to-red-400 h-full rounded-full';
+                    } else if (value < 2.0) {
+                        valueEl.className = 'text-xl font-bold text-yellow-500 data-value';
+                        barEl.className = 'progress-fill bg-gradient-to-r from-yellow-600 to-yellow-400 h-full rounded-full';
+                    } else {
+                        valueEl.className = 'text-xl font-bold text-green-500 data-value';
+                        barEl.className = 'progress-fill bg-gradient-to-r from-green-600 to-green-400 h-full rounded-full';
+                    }
+                }
+            });
+
+            const speed = Math.floor(Math.random() * 20) + 40;
+            document.getElementById('speed-value').textContent = speed;
+            const circumference = 2 * Math.PI * 88;
+            const offset = circumference - (speed / 120) * circumference;
+            document.getElementById('speed-circle').style.strokeDashoffset = offset;
+
+            const lat = 31.2304 + (Math.random() - 0.5) * 0.001;
+            const lng = 121.4737 + (Math.random() - 0.5) * 0.001;
+            document.getElementById('lat-value').textContent = lat.toFixed(4) + '°N';
+            document.getElementById('lng-value').textContent = lng.toFixed(4) + '°E';
+        }
+
+        setInterval(updateSensorData, 2000);
+
+        // GPS功能
+        let markerCount = 0;
+        function addMarker() {
+            markerCount++;
+            const markersContainer = document.getElementById('map-markers');
+            const marker = document.createElement('div');
+            const top = 20 + Math.random() * 60;
+            const left = 20 + Math.random() * 60;
+            
+            marker.className = 'absolute z-10';
+            marker.style.top = top + '%';
+            marker.style.left = left + '%';
+            marker.innerHTML = `
+                <div class="relative">
+                    <div class="w-4 h-4 bg-red-500 rounded-full border-2 border-white cursor-pointer hover:scale-125 transition-transform"></div>
+                    <div class="absolute top-5 left-1/2 transform -translate-x-1/2 whitespace-nowrap bg-black/80 px-2 py-1 rounded text-xs border border-red-500 text-white">
+                        标记点 ${markerCount}
+                    </div>
+                </div>
+            `;
+            markersContainer.appendChild(marker);
+        }
+
+        function clearMarkers() {
+            const markersContainer = document.getElementById('map-markers');
+            const currentPos = markersContainer.firstElementChild;
+            markersContainer.innerHTML = '';
+            markersContainer.appendChild(currentPos);
+            markerCount = 0;
+        }
+
+        // 紧急停车
+        function emergencyStop() {
+            document.getElementById('emergency-modal').classList.remove('hidden');
+        }
+
+        function closeEmergencyModal() {
+            document.getElementById('emergency-modal').classList.add('hidden');
+        }
+
+        // 键盘快捷键
+        document.addEventListener('keydown', (e) => {
+            // Ctrl/Cmd + S 导出当前视图
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                exportCurrentView();
+            }
+            // Ctrl/Cmd + Shift + S 导出全屏
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'S') {
+                e.preventDefault();
+                exportFullScreen();
+            }
+        });
+    </script>
+</body>
+</html>

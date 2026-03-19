@@ -1,0 +1,11 @@
+{
+  "name": "hmi-export-tools",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "export:png": "node scripts/export-components.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.52.0"
+  }
+}

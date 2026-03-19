@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>无人车HMI菜单示例</title>
+  <style>
+    :root {
+      --bg-1: #08111d;
+      --bg-2: #12263a;
+      --panel: #172a3d;
+      --panel-2: #21384f;
+      --line: #365a79;
+      --line-soft: rgba(139, 192, 232, 0.25);
+      --text: #e8f3ff;
+      --muted: #a5bfd6;
+      --green: #27d497;
+      --yellow: #ffd158;
+      --red: #ff5f63;
+      --cyan: #52c7ff;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(1200px 500px at 15% 5%, #1c3960 0%, transparent 60%),
+        radial-gradient(1000px 420px at 85% 90%, #183a52 0%, transparent 62%),
+        linear-gradient(180deg, var(--bg-2) 0%, var(--bg-1) 100%);
+      color: var(--text);
+      font-family: "Microsoft YaHei", "Segoe UI", sans-serif;
+      display: grid;
+      place-items: center;
+      min-height: 100vh;
+      padding: 12px;
+    }
+
+    .hmi {
+      width: min(1280px, 100vw - 24px);
+      height: min(720px, 100vh - 24px);
+      background: linear-gradient(155deg, rgba(28, 53, 76, 0.95), rgba(14, 27, 40, 0.96));
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 24px 45px rgba(2, 9, 18, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      display: grid;
+      grid-template-columns: 1fr 210px;
+      grid-template-rows: 1fr 92px;
+      gap: 10px;
+      padding: 10px;
+    }
+
+    .main {
+      background: linear-gradient(180deg, rgba(34, 56, 78, 0.72), rgba(24, 39, 56, 0.78));
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius-md);
+      padding: 10px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .title-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid rgba(119, 179, 230, 0.35);
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      background: linear-gradient(90deg, rgba(49, 90, 126, 0.4), rgba(45, 77, 107, 0.18));
+      font-size: 14px;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+    }
+
+    .status {
+      color: var(--green);
+      font-weight: 700;
+      text-shadow: 0 0 8px rgba(39, 212, 151, 0.35);
+    }
+
+    .page {
+      display: none;
+      flex: 1;
+      min-height: 0;
+      border: 1px solid rgba(129, 186, 234, 0.28);
+      border-radius: var(--radius-md);
+      padding: 10px;
+      background: linear-gradient(180deg, rgba(39, 65, 89, 0.68), rgba(27, 45, 62, 0.7));
+    }
+
+    .page.active {
+      display: grid;
+    }
+
+    .home-page {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .card {
+      border: 1px solid rgba(131, 191, 240, 0.26);
+      border-radius: var(--radius-md);
+      padding: 10px;
+      background:
+        linear-gradient(160deg, rgba(72, 124, 167, 0.24), rgba(33, 54, 76, 0.24) 48%, rgba(25, 41, 58, 0.28));
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .card h3 {
+      margin: 0 0 6px;
+      font-size: 15px;
+      color: #b8dbff;
+    }
+
+    .big {
+      font-size: 32px;
+      font-weight: 700;
+      color: #e9f6ff;
+    }
+
+    .small {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .gps-page {
+      grid-template-columns: 320px 1fr;
+      gap: 10px;
+    }
+
+    .gps-left, .gps-map-wrap, .obs-left, .obs-right, .info-box {
+      border: 1px solid rgba(129, 186, 234, 0.24);
+      border-radius: var(--radius-md);
+      background: linear-gradient(180deg, rgba(24, 40, 57, 0.65), rgba(15, 28, 41, 0.8));
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      padding: 10px;
+    }
+
+    .gps-left p, .info-box p {
+      margin: 7px 0;
+      font-size: 14px;
+    }
+
+    button {
+      border: 1px solid rgba(123, 193, 245, 0.52);
+      border-radius: 10px;
+      color: #e8f6ff;
+      background: linear-gradient(180deg, #3b78ad, #2b5886);
+      padding: 9px 12px;
+      cursor: pointer;
+      font-size: 14px;
+      box-shadow: 0 6px 14px rgba(7, 20, 34, 0.33), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      transition: transform 0.15s ease, filter 0.2s ease;
+    }
+
+    button:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+
+    .gps-actions {
+      margin-top: 8px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .gps-map {
+      width: 100%;
+      height: 100%;
+      border: 1px solid rgba(117, 176, 224, 0.35);
+      border-radius: var(--radius-sm);
+      background: linear-gradient(180deg, #112234, #0c1825);
+      display: block;
+    }
+
+    .obs-page {
+      grid-template-columns: 340px 1fr;
+      gap: 10px;
+    }
+
+    .meter {
+      margin-bottom: 12px;
+    }
+
+    .meter-head {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-bottom: 6px;
+      color: #c2e7ff;
+    }
+
+    .bar {
+      height: 18px;
+      border: 1px solid rgba(119, 183, 233, 0.3);
+      border-radius: 999px;
+      overflow: hidden;
+      background: linear-gradient(180deg, #122235, #0d1a29);
+    }
+
+    .fill {
+      height: 100%;
+      background: linear-gradient(90deg, #28d596, #ffd45f, #ff696e);
+      width: 0;
+      transition: width 0.3s;
+    }
+
+    .obs-canvas {
+      width: 100%;
+      height: 100%;
+      border: 1px solid rgba(117, 176, 224, 0.35);
+      border-radius: var(--radius-sm);
+      background: linear-gradient(180deg, #112234, #0c1825);
+      display: block;
+    }
+
+    .info-page {
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .menu {
+      grid-row: 1 / 2;
+      grid-column: 2 / 3;
+      border: 1px solid rgba(127, 186, 236, 0.32);
+      border-radius: var(--radius-md);
+      background: linear-gradient(180deg, rgba(40, 67, 92, 0.78), rgba(24, 43, 60, 0.9));
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+      align-content: start;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+    }
+
+    .menu button {
+      width: 100%;
+      text-align: center;
+      padding: 14px 8px;
+      font-size: 15px;
+      border-color: rgba(132, 192, 238, 0.4);
+      background: linear-gradient(180deg, #385f82, #2a4864);
+      border-radius: 12px;
+    }
+
+    .menu button.active {
+      background: linear-gradient(180deg, #4a98d3, #3478b6);
+      border-color: #8ad2ff;
+      color: #ffffff;
+      font-weight: 700;
+      box-shadow: 0 0 0 1px rgba(163, 223, 255, 0.2), 0 8px 16px rgba(13, 35, 55, 0.34);
+    }
+
+    .emergency {
+      grid-row: 2 / 3;
+      grid-column: 1 / 3;
+      border: 1px solid rgba(255, 133, 133, 0.42);
+      border-radius: var(--radius-md);
+      background: linear-gradient(180deg, rgba(95, 31, 35, 0.55), rgba(58, 17, 20, 0.72));
+      display: grid;
+      place-items: center;
+      padding: 10px;
+    }
+
+    .stop-btn {
+      width: 100%;
+      height: 100%;
+      font-size: 30px;
+      letter-spacing: 3px;
+      border: 1px solid #ffc0c0;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #ff5f63, #d8313b);
+      color: #fff;
+      font-weight: 700;
+      box-shadow: 0 12px 18px rgba(77, 10, 14, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.26);
+    }
+
+    .stop-btn:active {
+      background: linear-gradient(180deg, #d13d44, #be2831);
+      transform: translateY(1px);
+    }
+
+    @media (max-width: 980px) {
+      .hmi {
+        grid-template-columns: 1fr 160px;
+      }
+      .gps-page, .obs-page, .info-page {
+        grid-template-columns: 1fr;
+      }
+      .home-page {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="hmi">
+    <section class="main">
+      <div class="title-bar">
+        <div id="pageTitle">主界面</div>
+        <div class="status">串口在线 | 示例数据</div>
+      </div>
+
+      <div id="page-home" class="page home-page active">
+        <div class="card">
+          <h3>当前速度</h3>
+          <div class="big">1.2 m/s</div>
+          <div class="small">目标速度: 1.5 m/s</div>
+        </div>
+        <div class="card">
+          <h3>电池电量</h3>
+          <div class="big">78%</div>
+          <div class="small">电压: 48.9 V</div>
+        </div>
+        <div class="card">
+          <h3>任务状态</h3>
+          <div class="big" style="font-size: 24px;">巡航中</div>
+          <div class="small">路径点: 12 / 35</div>
+        </div>
+      </div>
+
+      <div id="page-gps" class="page gps-page">
+        <div class="gps-left">
+          <p>当前纬度: <strong id="latText">31.230410</strong></p>
+          <p>当前经度: <strong id="lngText">121.473701</strong></p>
+          <p>航向角: <strong id="yawText">88.5°</strong></p>
+          <p>定位状态: <strong style="color: var(--green);">RTK-FIX</strong></p>
+          <p>打点数量: <strong id="pointCount">0</strong></p>
+          <div class="gps-actions">
+            <button id="addPointBtn">当前位置打点</button>
+            <button id="moveBtn">模拟移动</button>
+            <button id="clearPointBtn">清空打点</button>
+          </div>
+        </div>
+        <div class="gps-map-wrap">
+          <canvas id="gpsCanvas" class="gps-map" width="800" height="480"></canvas>
+        </div>
+      </div>
+
+      <div id="page-obstacle" class="page obs-page">
+        <div class="obs-left">
+          <div class="meter">
+            <div class="meter-head"><span>左前超声波</span><span id="d-fl">42 cm</span></div>
+            <div class="bar"><div id="bar-fl" class="fill"></div></div>
+          </div>
+          <div class="meter">
+            <div class="meter-head"><span>右前超声波</span><span id="d-fr">67 cm</span></div>
+            <div class="bar"><div id="bar-fr" class="fill"></div></div>
+          </div>
+          <div class="meter">
+            <div class="meter-head"><span>左后超声波</span><span id="d-rl">95 cm</span></div>
+            <div class="bar"><div id="bar-rl" class="fill"></div></div>
+          </div>
+          <div class="meter">
+            <div class="meter-head"><span>右后超声波</span><span id="d-rr">53 cm</span></div>
+            <div class="bar"><div id="bar-rr" class="fill"></div></div>
+          </div>
+        </div>
+        <div class="obs-right">
+          <canvas id="obsCanvas" class="obs-canvas" width="800" height="480"></canvas>
+        </div>
+      </div>
+
+      <div id="page-info-1" class="page info-page">
+        <div class="info-box">
+          <h3>车辆信息</h3>
+          <p>车辆编号: AGV-TRK-001</p>
+          <p>控制器: STM32H743</p>
+          <p>驱动模式: 履带差速</p>
+          <p>累计里程: 128.4 km</p>
+          <p>运行时长: 186 h</p>
+        </div>
+        <div class="info-box">
+          <h3>系统状态</h3>
+          <p>电机温度: 45.2 °C</p>
+          <p>MCU温度: 51.8 °C</p>
+          <p>串口波特率: 115200</p>
+          <p>CAN通信: 正常</p>
+          <p>故障码: 无</p>
+        </div>
+      </div>
+
+      <div id="page-info-2" class="page info-page">
+        <div class="info-box">
+          <h3>车辆信息</h3>
+          <p>固件版本: v1.3.8</p>
+          <p>导航版本: NavCore v0.9</p>
+          <p>定位频率: 10 Hz</p>
+          <p>超声刷新: 20 Hz</p>
+          <p>日志状态: 开启</p>
+        </div>
+        <div class="info-box">
+          <h3>维护信息</h3>
+          <p>上次保养: 2026-02-28</p>
+          <p>下次保养: 2026-05-28</p>
+          <p>履带磨损: 31%</p>
+          <p>减速箱油位: 正常</p>
+          <p>维护建议: 30天后检查张紧度</p>
+        </div>
+      </div>
+    </section>
+
+    <aside class="menu">
+      <button class="menu-btn active" data-target="home">主界面</button>
+      <button class="menu-btn" data-target="gps">GPS定位</button>
+      <button class="menu-btn" data-target="obstacle">避障监测</button>
+      <button class="menu-btn" data-target="info-1">车辆信息</button>
+      <button class="menu-btn" data-target="info-2">车辆信息</button>
+    </aside>
+
+    <div class="emergency">
+      <button class="stop-btn" id="stopBtn">一键停车</button>
+    </div>
+  </div>
+
+  <script>
+    const pageTitle = document.getElementById("pageTitle");
+    const menuButtons = document.querySelectorAll(".menu-btn");
+    const pages = {
+      home: document.getElementById("page-home"),
+      gps: document.getElementById("page-gps"),
+      obstacle: document.getElementById("page-obstacle"),
+      "info-1": document.getElementById("page-info-1"),
+      "info-2": document.getElementById("page-info-2")
+    };
+    const pageNames = {
+      home: "主界面",
+      gps: "GPS定位",
+      obstacle: "避障监测",
+      "info-1": "车辆信息",
+      "info-2": "车辆信息"
+    };
+
+    menuButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        menuButtons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        Object.values(pages).forEach(p => p.classList.remove("active"));
+        pages[btn.dataset.target].classList.add("active");
+        pageTitle.textContent = pageNames[btn.dataset.target];
+      });
+    });
+
+    const gpsCanvas = document.getElementById("gpsCanvas");
+    const gpsCtx = gpsCanvas.getContext("2d");
+    const latText = document.getElementById("latText");
+    const lngText = document.getElementById("lngText");
+    const yawText = document.getElementById("yawText");
+    const pointCount = document.getElementById("pointCount");
+
+    let current = { x: 400, y: 240, lat: 31.230410, lng: 121.473701, yaw: 88.5 };
+    let gpsPoints = [];
+
+    function drawGps() {
+      gpsCtx.clearRect(0, 0, gpsCanvas.width, gpsCanvas.height);
+      gpsCtx.strokeStyle = "#244157";
+      gpsCtx.lineWidth = 1;
+      for (let x = 0; x <= gpsCanvas.width; x += 40) {
+        gpsCtx.beginPath();
+        gpsCtx.moveTo(x, 0);
+        gpsCtx.lineTo(x, gpsCanvas.height);
+        gpsCtx.stroke();
+      }
+      for (let y = 0; y <= gpsCanvas.height; y += 40) {
+        gpsCtx.beginPath();
+        gpsCtx.moveTo(0, y);
+        gpsCtx.lineTo(gpsCanvas.width, y);
+        gpsCtx.stroke();
+      }
+
+      gpsCtx.fillStyle = "#3bb7ff";
+      gpsPoints.forEach(p => {
+        gpsCtx.beginPath();
+        gpsCtx.arc(p.x, p.y, 5, 0, Math.PI * 2);
+        gpsCtx.fill();
+      });
+
+      if (gpsPoints.length > 1) {
+        gpsCtx.strokeStyle = "#57d8ff";
+        gpsCtx.lineWidth = 2;
+        gpsCtx.beginPath();
+        gpsCtx.moveTo(gpsPoints[0].x, gpsPoints[0].y);
+        for (let i = 1; i < gpsPoints.length; i++) {
+          gpsCtx.lineTo(gpsPoints[i].x, gpsPoints[i].y);
+        }
+        gpsCtx.stroke();
+      }
+
+      gpsCtx.fillStyle = "#23c483";
+      gpsCtx.beginPath();
+      gpsCtx.arc(current.x, current.y, 7, 0, Math.PI * 2);
+      gpsCtx.fill();
+      gpsCtx.fillStyle = "#bff3d8";
+      gpsCtx.fillText("当前位置", current.x + 10, current.y - 10);
+    }
+
+    function updateGpsText() {
+      latText.textContent = current.lat.toFixed(6);
+      lngText.textContent = current.lng.toFixed(6);
+      yawText.textContent = current.yaw.toFixed(1) + "°";
+      pointCount.textContent = gpsPoints.length;
+    }
+
+    document.getElementById("addPointBtn").addEventListener("click", () => {
+      gpsPoints.push({ x: current.x, y: current.y });
+      updateGpsText();
+      drawGps();
+    });
+
+    document.getElementById("clearPointBtn").addEventListener("click", () => {
+      gpsPoints = [];
+      updateGpsText();
+      drawGps();
+    });
+
+    document.getElementById("moveBtn").addEventListener("click", () => {
+      const dx = Math.floor(Math.random() * 31) - 15;
+      const dy = Math.floor(Math.random() * 31) - 15;
+      current.x = Math.max(20, Math.min(gpsCanvas.width - 20, current.x + dx));
+      current.y = Math.max(20, Math.min(gpsCanvas.height - 20, current.y + dy));
+      current.lat += dy * 0.000005;
+      current.lng += dx * 0.000005;
+      current.yaw = (current.yaw + Math.random() * 20 - 10 + 360) % 360;
+      updateGpsText();
+      drawGps();
+    });
+
+    const obsCanvas = document.getElementById("obsCanvas");
+    const obsCtx = obsCanvas.getContext("2d");
+
+    const sensorData = {
+      fl: 42,
+      fr: 67,
+      rl: 95,
+      rr: 53
+    };
+
+    function setMeter(id, distanceCm) {
+      const pct = Math.max(0, Math.min(100, distanceCm));
+      document.getElementById("d-" + id).textContent = distanceCm + " cm";
+      document.getElementById("bar-" + id).style.width = pct + "%";
+    }
+
+    function drawObstacleView() {
+      obsCtx.clearRect(0, 0, obsCanvas.width, obsCanvas.height);
+      obsCtx.strokeStyle = "#28455d";
+      obsCtx.lineWidth = 1;
+      for (let x = 0; x <= obsCanvas.width; x += 40) {
+        obsCtx.beginPath();
+        obsCtx.moveTo(x, 0);
+        obsCtx.lineTo(x, obsCanvas.height);
+        obsCtx.stroke();
+      }
+      for (let y = 0; y <= obsCanvas.height; y += 40) {
+        obsCtx.beginPath();
+        obsCtx.moveTo(0, y);
+        obsCtx.lineTo(obsCanvas.width, y);
+        obsCtx.stroke();
+      }
+
+      const vx = obsCanvas.width / 2 - 90;
+      const vy = obsCanvas.height / 2 - 55;
+      const vw = 180;
+      const vh = 110;
+
+      obsCtx.fillStyle = "rgba(59,183,255,0.15)";
+      obsCtx.fillRect(vx, vy, vw, vh);
+      obsCtx.strokeStyle = "#58c7ff";
+      obsCtx.lineWidth = 2;
+      obsCtx.strokeRect(vx, vy, vw, vh);
+      obsCtx.fillStyle = "#a8e7ff";
+      obsCtx.fillText("车辆包络", vx + 56, vy - 10);
+
+      const obstacles = [
+        { x: vx - 60, y: vy + 10, color: "#ff6a6a", label: "障碍 A" },
+        { x: vx + vw + 50, y: vy + 8, color: "#ff6a6a", label: "障碍 B" },
+        { x: vx - 40, y: vy + vh + 30, color: "#ffd26f", label: "障碍 C" },
+        { x: vx + vw + 40, y: vy + vh + 28, color: "#ffd26f", label: "障碍 D" }
+      ];
+
+      obstacles.forEach(ob => {
+        obsCtx.fillStyle = ob.color;
+        obsCtx.beginPath();
+        obsCtx.arc(ob.x, ob.y, 11, 0, Math.PI * 2);
+        obsCtx.fill();
+        obsCtx.fillStyle = "#ffe7e7";
+        obsCtx.fillText(ob.label, ob.x - 20, ob.y - 14);
+      });
+
+      obsCtx.strokeStyle = "#77e2ff";
+      obsCtx.beginPath();
+      obsCtx.moveTo(vx, vy);
+      obsCtx.lineTo(vx - 60, vy + 10);
+      obsCtx.moveTo(vx + vw, vy);
+      obsCtx.lineTo(vx + vw + 50, vy + 8);
+      obsCtx.moveTo(vx, vy + vh);
+      obsCtx.lineTo(vx - 40, vy + vh + 30);
+      obsCtx.moveTo(vx + vw, vy + vh);
+      obsCtx.lineTo(vx + vw + 40, vy + vh + 28);
+      obsCtx.stroke();
+    }
+
+    setMeter("fl", sensorData.fl);
+    setMeter("fr", sensorData.fr);
+    setMeter("rl", sensorData.rl);
+    setMeter("rr", sensorData.rr);
+    drawObstacleView();
+    updateGpsText();
+    drawGps();
+
+    document.getElementById("stopBtn").addEventListener("click", () => {
+      alert("紧急停车指令已触发（示例）");
+    });
+  </script>
+</body>
+</html>
