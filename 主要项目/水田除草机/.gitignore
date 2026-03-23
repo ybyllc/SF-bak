@@ -35,3 +35,7 @@ __pycache__/
 **/MDK-ARM/**/*.map
 **/MDK-ARM/**/*.htm
 **/MDK-ARM/**/*.hex
+
+# Local scratch / experimental projects
+代码/LED_TEST/
+代码/新建 文本文档.txt
