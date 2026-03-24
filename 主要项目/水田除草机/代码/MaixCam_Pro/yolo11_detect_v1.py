@@ -1,7 +1,7 @@
 """
 MaixCAM Pro 水瓶识别 + 串口发送坐标
 功能：使用YOLO11检测水瓶(bottle)，发送中心坐标(x,y)到下位机(STM32/Arduino等)
-协议格式：帧头(0xAA,0x55) + X高字节 + X低字节 + Y高字节 + Y低字节 + 置信度 + 帧尾(0x5B)
+协议格式：AA 55 21 CLASS XH XL YH YL FLAG CHECK 0D 0A
 """
 
 from maix import camera, display, image, time, app, uart, pinmap
@@ -17,8 +17,10 @@ MODEL_PATH = "/root/models/yolo11n.mud"  # YOLO11模型路径，需包含bottle�
 
 # 检测配置
 TARGET_CLASS = "bottle"     # 目标类别名称
+TARGET_CLASS_ID = 1         # 1-水瓶，2-草，3-其他
 CONFIDENCE_THRESHOLD = 0.5  # 置信度阈值
 SEND_INTERVAL_MS = 50       # 发送间隔(ms)，避免串口阻塞
+COORD_RANGE = 1000          # 坐标偏差范围: -1000~1000
 
 # 显示配置
 SHOW_DISPLAY = True         # 是否显示画面
@@ -59,55 +61,41 @@ def init_display():
     return None
 
 # ==================== 串口通信协议 ====================
-def send_bottle_data(serial, x, y, confidence, width, height):
+def clamp(value, lo, hi):
+    return max(lo, min(hi, value))
+
+def calc_norm_offset(px, py, img_w, img_h):
+    """将像素坐标转换为相对中心偏差，范围约 -1000~1000"""
+    nx = int((px - img_w // 2) * COORD_RANGE / (img_w / 2))
+    ny = int((py - img_h // 2) * COORD_RANGE / (img_h / 2))
+    return clamp(nx, -COORD_RANGE, COORD_RANGE), clamp(ny, -COORD_RANGE, COORD_RANGE)
+
+def send_detection_data(serial, class_id, norm_x, norm_y, flag):
     """
-    发送水瓶检测数据到下位机
-    协议：0xAA 0x55 XH XL YH YL CONF W H CHECKSUM 0x5B
-    
-    Args:
-        serial: UART对象
-        x, y: 水瓶中心坐标(0-65535)
-        confidence: 置信度(0-255)
-        width, height: 检测框宽高
+    协议：AA 55 21 CLASS XH XL YH YL FLAG CHECK 0D 0A
+    CHECK = (CMD + CLASS + XH + XL + YH + YL + FLAG) & 0xFF
+    FLAG: 0-未识别, 1-识别, 2-丢失(预测)
     """
-    # 数据打包
-    x = int(x) & 0xFFFF
-    y = int(y) & 0xFFFF
-    conf = int(confidence * 255) & 0xFF
-    w = int(width) & 0xFF
-    h = int(height) & 0xFF
-    
-    # 构建数据包
+    x = int(norm_x) & 0xFFFF
+    y = int(norm_y) & 0xFFFF
+
     data = bytearray([
-        0xAA, 0x55,           # 帧头
-        (x >> 8) & 0xFF,      # X高字节
-        x & 0xFF,             # X低字节
-        (y >> 8) & 0xFF,      # Y高字节
-        y & 0xFF,             # Y低字节
-        conf,                 # 置信度
-        w,                    # 宽度
-        h,                    # 高度
-        0x00,                 # 校验和占位
-        0x5B                  # 帧尾
+        0xAA, 0x55,             # 帧头
+        0x21,                   # 命令字
+        int(class_id) & 0xFF,   # 类别
+        (x >> 8) & 0xFF, x & 0xFF,
+        (y >> 8) & 0xFF, y & 0xFF,
+        int(flag) & 0xFF,       # 状态
+        0x00,                   # 校验和占位
+        0x0D, 0x0A              # 帧尾
     ])
-    
-    # 计算校验和(除帧头帧尾外所有字节之和的低8位)
-    checksum = sum(data[2:9]) & 0xFF
-    data[9] = checksum
-    
-    # 发送数据
+
+    data[9] = sum(data[2:9]) & 0xFF
     serial.write(bytes(data))
-    
-    # 可选：同时发送字符串格式方便调试
-    debug_str = f"BOT:{x},{y},{conf},{w},{h}\n"
-    serial.write_str(debug_str)
 
 def send_no_target(serial):
     """发送无目标信号"""
-    # 特殊包表示未检测到目标
-    data = bytes([0xAA, 0x55, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x5B])
-    serial.write(data)
-    serial.write_str("BOT:NONE\n")
+    send_detection_data(serial, 0, 0, 0, 0)
 
 # ==================== 主程序 ====================
 def main():
@@ -184,12 +172,12 @@ def main():
             if target_obj:
                 center_x = target_obj.x + target_obj.w // 2
                 center_y = target_obj.y + target_obj.h // 2
-                send_bottle_data(serial, center_x, center_y, 
-                               target_obj.score, target_obj.w, target_obj.h)
-                print(f"Sent: X={center_x}, Y={center_y}, Conf={target_obj.score:.2f}")
+                norm_x, norm_y = calc_norm_offset(center_x, center_y, img.width(), img.height())
+                send_detection_data(serial, TARGET_CLASS_ID, norm_x, norm_y, 1)
+                print(f"Sent: CLASS={TARGET_CLASS_ID}, X={norm_x}, Y={norm_y}, FLAG=1")
             else:
                 send_no_target(serial)
-                print("Sent: No target")
+                print("Sent: CLASS=0, X=0, Y=0, FLAG=0")
             
             last_send_time = current_time
         

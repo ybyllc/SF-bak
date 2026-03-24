@@ -4,7 +4,7 @@ yolo11_detect_v3.py - 水瓶追踪优化版
 1. 坐标归一化：输出 (-1000, 1000) 的偏移量，直接对接下位机 PID。
 2. 距离评估：通过 Bounding Box 的尺寸评估距离。
 3. 目标锁定：结合位置连续性、置信度和大小进行综合筛选。
-4. 串口协议：增加 W, H 输出，去除冗余，增加状态同步。
+4. 串口协议：统一为 AA 55 21 CLASS XH XL YH YL FLAG CHECK 0D 0A。
 """
 
 from maix import camera, display, image, app, uart, nn
@@ -18,6 +18,7 @@ UART_BAUDRATE = 115200
 
 MODEL_PATH = "/root/models/yolo11n.mud"
 TARGET_CLASS = "bottle"
+TARGET_CLASS_ID = 1  # 1-水瓶，2-草，3-其他
 CONFIDENCE_THRESHOLD = 0.45  # 稍微调低，靠卡尔曼滤波维持稳定性
 IOU_THRESHOLD = 0.45
 
@@ -153,31 +154,34 @@ class BottleTracker:
 # ==================== 串口与主程序 ====================
 def send_data(ser, result):
     """
-    协议：0xAA 0x55 [X_High] [X_Low] [Y_High] [Y_Low] [W_High] [W_Low] [H_High] [H_Low] [State] [Check] 0x5B
+    协议：AA 55 21 CLASS XH XL YH YL FLAG CHECK 0D 0A
+    CHECK = (CMD + CLASS + XH + XL + YH + YL + FLAG) & 0xFF
+    FLAG: 0-未识别, 1-识别, 2-丢失(预测)
     """
-    def to_u16(val): return int(val) & 0xFFFF
+    def clamp(value, lo, hi):
+        return max(lo, min(hi, value))
 
-    x = to_u16(result['norm_x'])
-    y = to_u16(result['norm_y'])
-    w = to_u16(result['w'])
-    h = to_u16(result['h'])
+    flag_map = {"LOST": 0, "TRACKING": 1, "PREDICTING": 2}
+    flag = flag_map.get(result['state'], 0)
+    class_id = TARGET_CLASS_ID if flag != 0 else 0
 
-    state_map = {"LOST": 0, "TRACKING": 1, "PREDICTING": 2}
-    s_code = state_map.get(result['state'], 0)
+    norm_x = clamp(int(result['norm_x']), -COORD_RANGE, COORD_RANGE) if flag != 0 else 0
+    norm_y = clamp(int(result['norm_y']), -COORD_RANGE, COORD_RANGE) if flag != 0 else 0
+    x = norm_x & 0xFFFF
+    y = norm_y & 0xFFFF
 
     payload = bytearray([
         0xAA, 0x55,
+        0x21,
+        class_id & 0xFF,
         (x >> 8) & 0xFF, x & 0xFF,
         (y >> 8) & 0xFF, y & 0xFF,
-        (w >> 8) & 0xFF, w & 0xFF,
-        (h >> 8) & 0xFF, h & 0xFF,
-        s_code
+        flag & 0xFF,
+        0x00,
+        0x0D, 0x0A
     ])
 
-    checksum = sum(payload[2:]) & 0xFF
-    payload.append(checksum)
-    payload.append(0x5B)
-
+    payload[9] = sum(payload[2:9]) & 0xFF
     ser.write(bytes(payload))
 
 def main():

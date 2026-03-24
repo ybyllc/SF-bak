@@ -15,6 +15,7 @@ UART_BAUDRATE = 115200
 # 模型配置
 MODEL_PATH = "/root/models/yolo11n.mud"
 TARGET_CLASS = "bottle"
+TARGET_CLASS_ID = 1             # 1-水瓶，2-草，3-其他
 CONFIDENCE_THRESHOLD = 0.5
 
 # 卡尔曼滤波配置
@@ -26,6 +27,7 @@ KALMAN_ESTIMATE_ERROR = 1.0     # 初始估计误差
 PREDICTION_TIMEOUT_MS = 500     # 预测模式超时时间(丢失目标后持续预测多久)
 SEND_INTERVAL_MS = 20           # 串口发送间隔(50Hz)
 MIN_CONFIDENCE_FOR_UPDATE = 0.3 # 卡尔曼更新的最低置信度
+COORD_RANGE = 1000              # 坐标偏差范围: -1000~1000
 
 # 显示配置
 SHOW_DISPLAY = True
@@ -350,52 +352,37 @@ def init_uart():
     print(f"UART initialized: {UART_DEVICE} @ {UART_BAUDRATE}bps")
     return serial
 
-def send_tracking_data(serial, x, y, vx, vy, is_prediction, confidence, state_code):
+def clamp(value, lo, hi):
+    return max(lo, min(hi, value))
+
+def calc_norm_offset(px, py, img_w, img_h):
+    """将像素坐标转换为相对中心偏差，范围约 -1000~1000"""
+    nx = int((px - img_w // 2) * COORD_RANGE / (img_w / 2))
+    ny = int((py - img_h // 2) * COORD_RANGE / (img_h / 2))
+    return clamp(nx, -COORD_RANGE, COORD_RANGE), clamp(ny, -COORD_RANGE, COORD_RANGE)
+
+def send_tracking_data(serial, class_id, norm_x, norm_y, flag):
     """
-    发送追踪数据到下位机(增强版协议)
-    协议：0xAA 0x55 XH XL YH YL VXH VXL VYH VYL FLAGS CONF STATE CHECK 0x5B
-    
-    FLAGS: bit0=是否预测值, bit1=是否丢失, bit2-bit7=预留
+    协议：AA 55 21 CLASS XH XL YH YL FLAG CHECK 0D 0A
+    CHECK = (CMD + CLASS + XH + XL + YH + YL + FLAG) & 0xFF
+    FLAG: 0-未识别, 1-识别, 2-丢失(预测)
     """
-    x = int(x) & 0xFFFF
-    y = int(y) & 0xFFFF
-    vx_i = int(vx) & 0xFFFF  # 速度放大100倍传输
-    vy_i = int(vy) & 0xFFFF
-    conf = int(confidence * 255) & 0xFF
-    
-    flags = 0
-    if is_prediction:
-        flags |= 0x01
-    if state_code == 0:  # LOST
-        flags |= 0x02
-    
+    x = int(norm_x) & 0xFFFF
+    y = int(norm_y) & 0xFFFF
+
     data = bytearray([
-        0xAA, 0x55,           # 帧头
-        (x >> 8) & 0xFF,      # X
-        x & 0xFF,
-        (y >> 8) & 0xFF,      # Y
-        y & 0xFF,
-        (vx_i >> 8) & 0xFF,   # VX
-        vx_i & 0xFF,
-        (vy_i >> 8) & 0xFF,   # VY
-        vy_i & 0xFF,
-        flags,                # 标志位
-        conf,                 # 置信度
-        state_code,           # 状态码(0=LOST, 1=TRACKING, 2=PREDICTING)
-        0x00,                 # 校验和占位
-        0x5B                  # 帧尾
+        0xAA, 0x55,             # 帧头
+        0x21,                   # 命令字
+        int(class_id) & 0xFF,   # 类别
+        (x >> 8) & 0xFF, x & 0xFF,
+        (y >> 8) & 0xFF, y & 0xFF,
+        int(flag) & 0xFF,       # 状态
+        0x00,                   # 校验和占位
+        0x0D, 0x0A              # 帧尾
     ])
-    
-    # 计算校验和
-    checksum = sum(data[2:13]) & 0xFF
-    data[13] = checksum
-    
+
+    data[9] = sum(data[2:9]) & 0xFF
     serial.write(bytes(data))
-    
-    # 调试字符串
-    state_str = ["LOST", "TRACKING", "PREDICTING"][state_code] if state_code < 3 else "UNKNOWN"
-    debug_str = f"TRK:{x},{y},{int(vx)},{int(vy)},{state_str},{'P' if is_prediction else 'D'}\n"
-    serial.write_str(debug_str)
 
 # ==================== 可视化 ====================
 def draw_tracking_info(img, tracker, x, y, is_prediction):
@@ -482,12 +469,12 @@ def main():
         # 串口发送
         current_time = time.ticks_ms()
         if time.ticks_diff(current_time, last_send_time) >= SEND_INTERVAL_MS:
-            state_code = 0 if state == "LOST" else (1 if state == "TRACKING" else 2)
-            if success:
-                send_tracking_data(serial, x, y, vx, vy, is_prediction, 
-                                 tracker.target_score, state_code)
+            flag = 0 if state == "LOST" else (1 if state == "TRACKING" else 2)
+            if flag == 0:
+                send_tracking_data(serial, 0, 0, 0, 0)
             else:
-                send_tracking_data(serial, 0, 0, 0, 0, False, 0, 0)  # LOST信号
+                norm_x, norm_y = calc_norm_offset(x, y, img.width(), img.height())
+                send_tracking_data(serial, TARGET_CLASS_ID, norm_x, norm_y, flag)
             
             last_send_time = current_time
         

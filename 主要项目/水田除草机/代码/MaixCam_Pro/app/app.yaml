@@ -1,0 +1,10 @@
+id: bottle_track
+name: SF_yolo
+version: 0.0.41
+author: hsc
+icon: ''
+desc: 四方的水田除草机图像识别
+files:
+  - app.yaml
+  - kalman.py
+  - main.py
