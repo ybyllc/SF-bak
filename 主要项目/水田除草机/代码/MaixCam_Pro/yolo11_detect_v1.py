@@ -20,7 +20,7 @@ TARGET_CLASS = "bottle"     # 目标类别名称
 TARGET_CLASS_ID = 1         # 1-水瓶，2-草，3-其他
 CONFIDENCE_THRESHOLD = 0.5  # 置信度阈值
 SEND_INTERVAL_MS = 50       # 发送间隔(ms)，避免串口阻塞
-COORD_RANGE = 1000          # 坐标偏差范围: -1000~1000
+COORD_RANGE = 160          # 坐标偏差范围: -1000~1000
 
 # 显示配置
 SHOW_DISPLAY = True         # 是否显示画面
@@ -99,16 +99,15 @@ def send_no_target(serial):
 
 # ==================== 主程序 ====================
 def main():
-    print("=== MaixCAM Pro Bottle Tracker ===")
-    
-    # 初始化
     try:
-        serial = init_uart()
-        detector = init_model()
-        cam = init_camera(detector)
-        disp = init_display()
+        # 初始化（与v4一致：main里直接调用）
+        serial = uart.UART(UART_DEVICE, UART_BAUDRATE)
+        detector = nn.YOLO11(model=MODEL_PATH, dual_buff=True)
+        cam = camera.Camera(detector.input_width(), detector.input_height(), detector.input_format())
+        cam.skip_frames(30)
+        disp = display.Display() if SHOW_DISPLAY else None
     except Exception as e:
-        print(f"Init error: {e}")
+        print(f"[Error] {e}")
         return
     
     # 检查目标类别是否存在
@@ -120,11 +119,10 @@ def main():
     frame_count = 0
     fps_time = time.ticks_ms()
     
-    print("Running... Press Ctrl+C to stop")
-    
     while not app.need_exit():
         # 读取图像
         img = cam.read()
+        #img = img.lens_corr(strength=1.4, zoom=1.0)
         
         # YOLO11检测
         objs = detector.detect(img, conf_th=CONFIDENCE_THRESHOLD, iou_th=0.45)
@@ -161,8 +159,6 @@ def main():
         # 计算FPS
         frame_count += 1
         if time.ticks_diff(time.ticks_ms(), fps_time) >= 1000:
-            fps = frame_count
-            print(f"FPS: {fps}")
             frame_count = 0
             fps_time = time.ticks_ms()
         
@@ -174,10 +170,8 @@ def main():
                 center_y = target_obj.y + target_obj.h // 2
                 norm_x, norm_y = calc_norm_offset(center_x, center_y, img.width(), img.height())
                 send_detection_data(serial, TARGET_CLASS_ID, norm_x, norm_y, 1)
-                print(f"Sent: CLASS={TARGET_CLASS_ID}, X={norm_x}, Y={norm_y}, FLAG=1")
             else:
                 send_no_target(serial)
-                print("Sent: CLASS=0, X=0, Y=0, FLAG=0")
             
             last_send_time = current_time
         

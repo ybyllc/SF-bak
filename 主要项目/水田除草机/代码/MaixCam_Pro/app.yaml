@@ -1,9 +1,8 @@
 id: bottle_tracker
-name: SF yolo
-version: 0.0.4
+name: SF_yolo_v2
+version: 0.0.21
 author: ybyllc
 icon: app.png
 desc: YOLO11 + Kalman filter bottle tracking with serial output
 files:
-  - kalman.py
   - main.py

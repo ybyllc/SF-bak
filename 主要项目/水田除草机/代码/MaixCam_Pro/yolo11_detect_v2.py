@@ -3,7 +3,7 @@ MaixCAM Pro 水瓶追踪系统 - 带卡尔曼滤波
 功能：YOLO11检测 + 卡尔曼滤波平滑 + 串口发送坐标到下位机
 """
 
-from maix import camera, display, image, time, app, uart, pinmap
+from maix import camera, display, image, app, uart, pinmap,time
 from maix import nn
 import math
 
@@ -14,7 +14,7 @@ UART_BAUDRATE = 115200
 
 # 模型配置
 MODEL_PATH = "/root/models/yolo11n.mud"
-TARGET_CLASS = "bottle"
+TARGET_CLASS = "bottle"         # 追踪的物体
 TARGET_CLASS_ID = 1             # 1-水瓶，2-草，3-其他
 CONFIDENCE_THRESHOLD = 0.5
 
@@ -104,6 +104,8 @@ class KalmanFilter2D:
             
         current_time = time.ticks_ms()
         dt = time.ticks_diff(current_time, self.last_update_time) / 1000.0  # 转换为秒
+        if dt <= 0:
+            dt = 0.033
         if dt > 1.0:  # 防止时间跳变
             dt = 0.033  # 默认30fps
         
@@ -120,18 +122,31 @@ class KalmanFilter2D:
         new_y = self.y + self.vy * dt
         
         # 预测误差协方差: P = F*P*F' + Q
-        # 简化的协方差更新(忽略高阶项)
-        self.P[0][0] += self.P[0][2] * dt + self.P[2][0] * dt + self.P[2][2] * dt * dt + self.Q[0][0]
-        self.P[0][1] += self.P[0][3] * dt + self.P[2][1] * dt + self.P[2][3] * dt * dt
-        self.P[1][0] += self.P[1][2] * dt + self.P[3][0] * dt + self.P[3][2] * dt * dt
-        self.P[1][1] += self.P[1][3] * dt + self.P[3][1] * dt + self.P[3][3] * dt * dt + self.Q[1][1]
-        self.P[0][2] += self.P[2][2] * dt
-        self.P[0][3] += self.P[2][3] * dt
-        self.P[1][2] += self.P[3][2] * dt
-        self.P[1][3] += self.P[3][3] * dt
+        p00, p01, p02, p03 = self.P[0]
+        p10, p11, p12, p13 = self.P[1]
+        p20, p21, p22, p23 = self.P[2]
+        p30, p31, p32, p33 = self.P[3]
+
+        self.P[0][0] = p00 + dt * (p02 + p20) + dt * dt * p22 + self.Q[0][0]
+        self.P[0][1] = p01 + dt * (p03 + p21) + dt * dt * p23
+        self.P[1][0] = p10 + dt * (p12 + p30) + dt * dt * p32
+        self.P[1][1] = p11 + dt * (p13 + p31) + dt * dt * p33 + self.Q[1][1]
+        self.P[0][2] = p02 + dt * p22
+        self.P[0][3] = p03 + dt * p23
+        self.P[1][2] = p12 + dt * p32
+        self.P[1][3] = p13 + dt * p33
+        self.P[2][0] = p20 + dt * p22
+        self.P[2][1] = p21 + dt * p23
+        self.P[2][2] = p22 + self.Q[2][2]
+        self.P[2][3] = p23
+        self.P[3][0] = p30 + dt * p32
+        self.P[3][1] = p31 + dt * p33
+        self.P[3][2] = p32
+        self.P[3][3] = p33 + self.Q[3][3]
         
         self.x = new_x
         self.y = new_y
+        self.last_update_time = current_time
         
         return (int(self.x), int(self.y))
     
@@ -145,7 +160,6 @@ class KalmanFilter2D:
             return
             
         current_time = time.ticks_ms()
-        dt = time.ticks_diff(current_time, self.last_update_time) / 1000.0
         
         # 计算卡尔曼增益 K = P*H' / (H*P*H' + R)
         # 简化的2x2矩阵求逆
@@ -181,10 +195,10 @@ class KalmanFilter2D:
         self.vy += K[3][0] * y0 + K[3][1] * y1
         
         # 更新协方差 P = (I - K*H) * P
-        # 简化为直接减去
+        old_P = [row[:] for row in self.P]
         for i in range(4):
             for j in range(4):
-                self.P[i][j] -= K[i][0] * self.P[0][j] + K[i][1] * self.P[1][j]
+                self.P[i][j] = old_P[i][j] - K[i][0] * old_P[0][j] - K[i][1] * old_P[1][j]
         
         # 限制速度，防止发散
         max_speed = 5000  # 像素/秒
@@ -220,13 +234,24 @@ class BottleTracker:
         self.state = "LOST"  # LOST, TRACKING, PREDICTING
         self.last_detection_time = 0
         self.prediction_count = 0
-        self.max_predictions = int(PREDICTION_TIMEOUT_MS / 33)  # 约30fps下的帧数
+        self.max_predictions = max(1, int(PREDICTION_TIMEOUT_MS / 33))  # 约30fps下的帧数
         
         # 轨迹记录
         self.trail = []  # [(x,y), ...]
         
         # 当前目标信息
         self.target_score = 0.0
+        self.target_w = 0
+        self.target_h = 0
+        self.target_label = "None"
+
+    def _set_lost(self):
+        """统一处理丢失状态，避免状态残留"""
+        self.state = "LOST"
+        self.kalman.reset()
+        self.trail.clear()
+        self.prediction_count = 0
+        self.target_label = "None"
         self.target_w = 0
         self.target_h = 0
         
@@ -245,14 +270,18 @@ class BottleTracker:
         
         # 2. 寻找最佳匹配目标
         best_obj = None
+        best_label = "None"
         best_score = 0
         
-        # 如果正在追踪，优先选择距离预测位置近的目标
-        predicted_pos = self.kalman.predict() if self.kalman.is_initialized else None
+        # 每帧只进行一次预测，避免状态被重复推进
+        predicted_pos = None
+        if self.kalman.is_initialized:
+            self.kalman.predict()
+            predicted_pos = self.kalman.get_position()
         
         for obj in objs:
             class_name = detector.labels[obj.class_id]
-            if TARGET_CLASS not in class_name and class_name not in TARGET_CLASS:
+            if class_name != TARGET_CLASS:
                 continue
                 
             # 计算匹配分数(置信度 + 距离惩罚)
@@ -271,6 +300,7 @@ class BottleTracker:
             if score > best_score:
                 best_score = score
                 best_obj = obj
+                best_label = class_name
         
         # 3. 状态机处理
         is_prediction = False
@@ -287,6 +317,7 @@ class BottleTracker:
             self.target_score = best_obj.score
             self.target_w = best_obj.w
             self.target_h = best_obj.h
+            self.target_label = best_label
             
             self.state = "TRACKING"
             self.last_detection_time = current_time
@@ -305,12 +336,10 @@ class BottleTracker:
             if self.state == "TRACKING" or self.state == "PREDICTING":
                 if predicted_pos:
                     # 检查预测超时
-                    if time.ticks_diff(current_time, self.last_detection_time) < PREDICTION_TIMEOUT_MS:
+                    elapsed_ms = time.ticks_diff(current_time, self.last_detection_time)
+                    if elapsed_ms < PREDICTION_TIMEOUT_MS and self.prediction_count < self.max_predictions:
                         self.state = "PREDICTING"
                         self.prediction_count += 1
-                        
-                        # 在预测模式下继续预测
-                        self.kalman.predict()
                         pos = self.kalman.get_position()
                         
                         # 轨迹也使用预测值
@@ -322,12 +351,10 @@ class BottleTracker:
                         return (True, pos[0], pos[1], True)
                     else:
                         # 预测超时，丢失目标
-                        self.state = "LOST"
-                        self.kalman.reset()
-                        self.trail.clear()
+                        self._set_lost()
                         return (False, 0, 0, False)
                 else:
-                    self.state = "LOST"
+                    self._set_lost()
                     return (False, 0, 0, False)
             else:
                 return (False, 0, 0, False)
@@ -344,13 +371,11 @@ class BottleTracker:
         """获取估计速度"""
         return self.kalman.get_velocity()
 
+    def get_target_info(self):
+        """获取当前目标信息"""
+        return (self.target_w, self.target_h, self.target_label)
+
 # ==================== 串口通信 ====================
-def init_uart():
-    """初始化串口"""
-    serial = uart.UART(UART_DEVICE, UART_BAUDRATE)
-    time.sleep_ms(100)
-    print(f"UART initialized: {UART_DEVICE} @ {UART_BAUDRATE}bps")
-    return serial
 
 def clamp(value, lo, hi):
     return max(lo, min(hi, value))
@@ -361,28 +386,37 @@ def calc_norm_offset(px, py, img_w, img_h):
     ny = int((py - img_h // 2) * COORD_RANGE / (img_h / 2))
     return clamp(nx, -COORD_RANGE, COORD_RANGE), clamp(ny, -COORD_RANGE, COORD_RANGE)
 
-def send_tracking_data(serial, class_id, norm_x, norm_y, flag):
+def send_data(ser, result):
     """
     协议：AA 55 21 CLASS XH XL YH YL FLAG CHECK 0D 0A
     CHECK = (CMD + CLASS + XH + XL + YH + YL + FLAG) & 0xFF
     FLAG: 0-未识别, 1-识别, 2-丢失(预测)
     """
-    x = int(norm_x) & 0xFFFF
-    y = int(norm_y) & 0xFFFF
+    def clamp(value, lo, hi):
+        return max(lo, min(hi, value))
 
-    data = bytearray([
-        0xAA, 0x55,             # 帧头
-        0x21,                   # 命令字
-        int(class_id) & 0xFF,   # 类别
+    flag_map = {"LOST": 0, "TRACKING": 1, "PREDICTING": 2}
+    flag = flag_map.get(result['state'], 0)
+    class_id = TARGET_CLASS_ID if flag != 0 else 0
+
+    norm_x = clamp(int(result['norm_x']), -COORD_RANGE, COORD_RANGE) if flag != 0 else 0
+    norm_y = clamp(int(result['norm_y']), -COORD_RANGE, COORD_RANGE) if flag != 0 else 0
+    x = norm_x & 0xFFFF
+    y = norm_y & 0xFFFF
+
+    payload = bytearray([
+        0xAA, 0x55,
+        0x21,
+        class_id & 0xFF,
         (x >> 8) & 0xFF, x & 0xFF,
         (y >> 8) & 0xFF, y & 0xFF,
-        int(flag) & 0xFF,       # 状态
-        0x00,                   # 校验和占位
-        0x0D, 0x0A              # 帧尾
+        flag & 0xFF,
+        0x00,
+        0x0D, 0x0A
     ])
 
-    data[9] = sum(data[2:9]) & 0xFF
-    serial.write(bytes(data))
+    payload[9] = sum(payload[2:9]) & 0xFF
+    ser.write(bytes(payload))
 
 # ==================== 可视化 ====================
 def draw_tracking_info(img, tracker, x, y, is_prediction):
@@ -390,6 +424,7 @@ def draw_tracking_info(img, tracker, x, y, is_prediction):
     trail = tracker.get_trail()
     state = tracker.get_state()
     vx, vy = tracker.get_velocity()
+    target_w, target_h, target_label = tracker.get_target_info()
     
     # 绘制轨迹
     if DRAW_TRAIL and len(trail) > 1:
@@ -422,68 +457,76 @@ def draw_tracking_info(img, tracker, x, y, is_prediction):
         "PREDICTING": image.COLOR_YELLOW
     }.get(state, image.COLOR_WHITE)
     
-    info = f"State:{state} X:{x} Y:{y}"
+    display_state = "NONE" if state == "LOST" else state
+    info = f"State:{display_state}"
     img.draw_string(10, 10, info, color=status_color, scale=1.5)
-    
-    vel_info = f"VX:{vx:.1f} VY:{vy:.1f}"
-    img.draw_string(10, 35, vel_info, color=image.COLOR_BLUE, scale=1.2)
+
+    xywh_info = f"X:{x} Y:{y} W:{target_w} H:{target_h}"
+    img.draw_string(10, 35, xywh_info, color=image.COLOR_YELLOW, scale=1.5)
+
+    obj_info = f"O:{target_label}"
+    img.draw_string(10, 60, obj_info, color=image.COLOR_YELLOW, scale=1.2)
+
 
 # ==================== 主程序 ====================
 def main():
-    print("=== MaixCAM Pro Bottle Tracker with Kalman Filter ===")
-    
-    # 初始化
-    serial = init_uart()
-    detector = nn.YOLO11(model=MODEL_PATH, dual_buff=True)
-    cam = camera.Camera(detector.input_width(), detector.input_height(), detector.input_format())
-    cam.skip_frames(30)
-    disp = display.Display() if SHOW_DISPLAY else None
-    
-    tracker = BottleTracker()
-    
-    last_send_time = time.ticks_ms()
-    frame_count = 0
-    fps_time = time.ticks_ms()
-    
-    print("Running... Press Ctrl+C to stop")
-    
-    while not app.need_exit():
-        img = cam.read()
-        
-        # 更新追踪
-        success, x, y, is_prediction = tracker.update(detector, img)
-        state = tracker.get_state()
-        vx, vy = tracker.get_velocity()
-        
-        # 绘制检测结果(如果有)
-        if success and not is_prediction:
-            # 这里可以绘制YOLO原始检测框，但tracker.update已经消耗了objs
-            # 如需绘制检测框，需要修改tracker返回原始obj
-            pass
-        
-        # 可视化
-        if disp:
-            draw_tracking_info(img, tracker, x, y, is_prediction)
-            disp.show(img)
-        
-        # 串口发送
-        current_time = time.ticks_ms()
-        if time.ticks_diff(current_time, last_send_time) >= SEND_INTERVAL_MS:
-            flag = 0 if state == "LOST" else (1 if state == "TRACKING" else 2)
-            if flag == 0:
-                send_tracking_data(serial, 0, 0, 0, 0)
-            else:
-                norm_x, norm_y = calc_norm_offset(x, y, img.width(), img.height())
-                send_tracking_data(serial, TARGET_CLASS_ID, norm_x, norm_y, flag)
+    try:
+        serial = uart.UART(UART_DEVICE, UART_BAUDRATE)
+        detector = nn.YOLO11(model=MODEL_PATH, dual_buff=True)
+        cam = camera.Camera(detector.input_width(), detector.input_height(), detector.input_format())
+        if SHOW_DISPLAY:
+            disp = display.Display()
+        else:
+            disp = None
+        tracker = BottleTracker()
+
+        last_send = 0
+        frame_count = 0
+        fps_time = time.ticks_ms()
+
+        while not app.need_exit():
+            img = cam.read()
+            img = img.lens_corr(strength=0.85, zoom=1.0)
+
+            # 更新追踪
+            success, x, y, is_prediction = tracker.update(detector, img)
+            state = tracker.get_state()
+            vx, vy = tracker.get_velocity()
             
-            last_send_time = current_time
-        
-        # FPS计算
-        frame_count += 1
-        if time.ticks_diff(current_time, fps_time) >= 1000:
-            print(f"FPS: {frame_count}, State: {state}")
-            frame_count = 0
-            fps_time = current_time
+            # 绘制检测结果(如果有)
+            if success and not is_prediction:
+                # 这里可以绘制YOLO原始检测框，但tracker.update已经消耗了objs
+                # 如需绘制检测框，需要修改tracker返回原始obj
+                pass
+            # 可视化
+            if disp:
+                try:
+                    draw_tracking_info(img, tracker, x, y, is_prediction)
+                    disp.show(img)
+                except Exception:
+                    pass
+            
+            # FPS计算
+            frame_count += 1
+            current_time = time.ticks_ms()
+            if time.ticks_diff(current_time, fps_time) >= 1000:
+                # print(f"FPS: {frame_count}, State: {state}")
+                frame_count = 0
+                fps_time = current_time
+
+            # 串口发送
+            if (time.time() - last_send) * 1000 > SEND_INTERVAL_MS:
+                if state == "LOST":
+                    result = {"state": "LOST", "norm_x": 0, "norm_y": 0}
+                else:
+                    norm_x, norm_y = calc_norm_offset(x, y, img.width(), img.height())
+                    result = {"state": state, "norm_x": norm_x, "norm_y": norm_y}
+                send_data(serial, result)
+                last_send = time.time()
+
+
+    except Exception as e:
+        print(f"[Error] {e}")
 
 if __name__ == "__main__":
     main()
